@@ -1,0 +1,6 @@
+torch
+torchvision
+cython
+pycocotools
+matplotlib
+yacs
