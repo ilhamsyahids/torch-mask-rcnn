@@ -4,3 +4,5 @@ cython
 pycocotools
 matplotlib
 yacs
+pytorch_lightning
+wandb

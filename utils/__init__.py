@@ -5,10 +5,6 @@ import random
 import numpy as np
 
 
-def collate_fn(batch):
-    return tuple(zip(*batch))
-
-
 def mkdir(path):
     try:
         os.makedirs(path)

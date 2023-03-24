@@ -12,7 +12,20 @@ _C = CN()
 # Misc
 # -----------------------------------------------------------------------------
 
+_C.PROJECT_NAME = "PyTorch Mask R-CNN Training"
+_C.CONFIG_NAME = "Default"
 _C.OUTPUT_DIR = "checkpoint"
+
+_C.EPOCHS = 1
+
+# -----------------------------------------------------------------------------
+# Accelerator
+# -----------------------------------------------------------------------------
+
+_C.ACCELERATOR = CN()
+_C.ACCELERATOR.NAME = "gpu"
+_C.ACCELERATOR.DEVICES = 8
+_C.ACCELERATOR.PRECISION = 16
 
 # -----------------------------------------------------------------------------
 # Dataset
@@ -23,6 +36,7 @@ _C.DATASET.NAME = "coco"
 _C.DATASET.DATA_PATH = "/data/coco"
 _C.DATASET.DATA_AUGMENTATION = "hflip"
 _C.DATASET.WEIGHTS = None
+_C.DATASET.NUM_CLASSES = 91
 
 # -----------------------------------------------------------------------------
 # Model
@@ -30,5 +44,11 @@ _C.DATASET.WEIGHTS = None
 
 _C.MODEL = CN()
 
+# -----------------------------------------------------------------------------
+# Logger
+# -----------------------------------------------------------------------------
+
+_C.LOGGER = CN()
+_C.LOGGER.OUTPUT_DIR = "logs"
 
 cfg = _C

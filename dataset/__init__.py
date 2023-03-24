@@ -2,6 +2,7 @@ import torchvision
 
 from . import presets
 from .coco import get_coco
+from .transforms import SimpleCopyPaste, InterpolationMode
 
 
 def get_transform(train, cfg):
@@ -23,4 +24,13 @@ def get_datasets(name, cfg):
         raise RuntimeError("Only COCO dataset is supported for now.")
 
     return train, val
+
+
+def collate_fn(batch):
+    return tuple(zip(*batch))
+
+
+def copypaste_collate_fn(batch):
+    copypaste = SimpleCopyPaste(blending=True, resize_interpolation=InterpolationMode.BILINEAR)
+    return copypaste(*collate_fn(batch))
 
