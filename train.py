@@ -3,10 +3,12 @@ import torch
 
 from pytorch_lightning import Trainer
 from pytorch_lightning.loggers import WandbLogger, CSVLogger
-from pytorch_lightning.callbacks import ModelCheckpoint
+from pytorch_lightning.callbacks import ModelCheckpoint, TQDMProgressBar
 
 import utils
 import dataset
+import models
+import optimizers
 
 from config import cfg
 
@@ -27,22 +29,22 @@ def main(cfg):
     train_dataset, val_dataset = dataset.get_datasets(cfg.DATASET.NAME, cfg.DATASET)
 
     train_collate_fn = dataset.collate_fn
-    if args.use_copypaste:
+    if cfg.USE_SIMPLE_COPY_PASTE:
         if args.data_augmentation != "lsj":
             raise RuntimeError("SimpleCopyPaste algorithm currently only supports the 'lsj' data augmentation policies")
 
         train_collate_fn = dataset.copypaste_collate_fn
 
     train_dataloader = torch.utils.data.DataLoader(
-        train_dataset, num_workers=args.workers, collate_fn=train_collate_fn
+        train_dataset, collate_fn=train_collate_fn, num_workers=cfg.DATALOADER.WORKERS, batch_size=cfg.DATALOADER.TRAIN_BATCH_SIZE
     )
 
     val_dataloader = torch.utils.data.DataLoader(
-        val_dataset, batch_size=1, num_workers=args.workers, collate_fn=dataset.collate_fn
+        val_dataset, collate_fn=dataset.collate_fn, num_workers=cfg.DATALOADER.WORKERS, batch_size=cfg.DATALOADER.VAL_BATCH_SIZE
     )
 
     print("Building logger...")
-    wandb_logger = WandbLogger(name=cfg.CONFIG_NAME, project=cfg.PROJECT_NAME, log_model='all')
+    wandb_logger = WandbLogger(name=cfg.CONFIG_NAME, project=cfg.PROJECT_NAME, offline=True)
     csv_logger = CSVLogger(save_dir=cfg.LOGGER.OUTPUT_DIR, name=cfg.CONFIG_NAME)
 
 
@@ -54,24 +56,54 @@ def main(cfg):
         'every_n_epochs': 1,
         'dirpath': cfg.OUTPUT_DIR,
     }
-
     checkpoint_callback = ModelCheckpoint(**checkpoint_params)  # Model check
+
+    tqdm_params = {
+        'refresh_rate': cfg.PRINT_FREQ,
+    }
+    tqdm_callback = TQDMProgressBar(**tqdm_params)
 
 
     print("Building model...")
-    
+    model_params = {
+        'num_classes': cfg.DATASET.NUM_CLASSES,
+        'version': cfg.MODEL.VERSION,
+        'pretrained': cfg.MODEL.PRETRAINED,
+        'pretrained_backbone': cfg.MODEL.PRETRAINED_BACKBONE,
+    }
+    model = models.get_maskrcnn(**model_params)
+
+    print("Building optimizer...")
+    optimizer_params = {
+        'opt': cfg.OPTIMIZER.NAME,
+        'parameters': model.parameters(),
+        'lr': cfg.OPTIMIZER.LR,
+        'weight_decay': cfg.OPTIMIZER.WEIGHT_DECAY,
+        'nesterov': cfg.OPTIMIZER.NESTEROV,
+        'momentum': cfg.OPTIMIZER.MOMENTUM,
+    }
+    optimizer = optimizers.get_optimizer(**optimizer_params)
+
+    print("Building lightning model...")
+    module_params = {
+        'cfg': cfg,
+        'model': model,
+        'optimizer': optimizer,
+    }
+    model_lightning = models.Mask_RCNN_Lightning(**module_params)
 
     print("Training model...")
     training_params = {
+        'enable_progress_bar': False,
         'profiler': "simple",
         "logger": [wandb_logger, csv_logger],
-        'callbacks': [checkpoint_callback],
+        'callbacks': [tqdm_callback, checkpoint_callback],
         'accelerator': cfg.ACCELERATOR.NAME,
         'devices': cfg.ACCELERATOR.DEVICES,
         'max_epochs': cfg.EPOCHS,
     }
     fit_params = {
-        'model': model,
+        'model': model_lightning,
         'train_dataloaders': train_dataloader,
         'val_dataloaders': val_dataloader,
     }
