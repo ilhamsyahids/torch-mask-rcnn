@@ -1,8 +1,10 @@
 import argparse
+
 import torch
+import torch.utils.data.distributed
 
 from pytorch_lightning import Trainer
-from pytorch_lightning.loggers import WandbLogger, CSVLogger
+from pytorch_lightning.loggers import WandbLogger, CSVLogger, TensorBoardLogger
 from pytorch_lightning.callbacks import ModelCheckpoint, TQDMProgressBar
 
 import utils
@@ -35,17 +37,46 @@ def main(cfg):
 
         train_collate_fn = dataset.copypaste_collate_fn
 
-    train_dataloader = torch.utils.data.DataLoader(
-        train_dataset, collate_fn=train_collate_fn, num_workers=cfg.DATALOADER.WORKERS, batch_size=cfg.DATALOADER.TRAIN_BATCH_SIZE
-    )
+    # required for TPU support
+    train_sampler = None
+    if cfg.ACCELERATOR.NAME == 'tpu':
+        import torch_xla.core.xla_model as xm
 
-    val_dataloader = torch.utils.data.DataLoader(
-        val_dataset, collate_fn=dataset.collate_fn, num_workers=cfg.DATALOADER.WORKERS, batch_size=cfg.DATALOADER.VAL_BATCH_SIZE
-    )
+        train_sampler = torch.utils.data.distributed.DistributedSampler(
+            train_dataset, num_replicas=xm.xrt_world_size(), rank=xm.get_ordinal(), shuffle=True
+        )
+    
+    train_dataloader_params = {
+        'dataset': train_dataset,
+        'collate_fn': train_collate_fn,
+        'num_workers': cfg.DATALOADER.WORKERS,
+        'batch_size': cfg.DATALOADER.TRAIN_BATCH_SIZE,
+        'sampler': train_sampler,
+    }
+
+    val_dataloader_params = {
+        'dataset': val_dataset,
+        'collate_fn': dataset.collate_fn,
+        'num_workers': cfg.DATALOADER.WORKERS,
+        'batch_size': cfg.DATALOADER.VAL_BATCH_SIZE,
+    }
+
+    train_dataloader = torch.utils.data.DataLoader(**train_dataloader_params)
+    val_dataloader = torch.utils.data.DataLoader(**val_dataloader_params)
 
     print("Building logger...")
-    wandb_logger = WandbLogger(name=cfg.CONFIG_NAME, project=cfg.PROJECT_NAME, offline=True)
-    csv_logger = CSVLogger(save_dir=cfg.LOGGER.OUTPUT_DIR, name=cfg.CONFIG_NAME)
+    logger_params = {
+        # csv & tensorboard & wandb
+        'save_dir': cfg.LOGGER.OUTPUT_DIR,
+        'name': cfg.CONFIG_NAME,
+
+        # wandb
+        'project': cfg.PROJECT_NAME,
+        'offline': True
+    }
+    wandb_logger = WandbLogger(**logger_params)
+    csv_logger = CSVLogger(**logger_params)
+    tb_logger = TensorBoardLogger(**logger_params)
 
 
     print("Building callback...")
@@ -96,7 +127,7 @@ def main(cfg):
     training_params = {
         'enable_progress_bar': False,
         'profiler': "simple",
-        "logger": [wandb_logger, csv_logger],
+        "logger": [wandb_logger, csv_logger, tb_logger],
         'callbacks': [tqdm_callback, checkpoint_callback],
         'accelerator': cfg.ACCELERATOR.NAME,
         'devices': cfg.ACCELERATOR.DEVICES,
