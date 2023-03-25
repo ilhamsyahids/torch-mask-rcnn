@@ -65,18 +65,24 @@ def main(cfg):
     val_dataloader = torch.utils.data.DataLoader(**val_dataloader_params)
 
     print("Building logger...")
-    logger_params = {
-        # csv & tensorboard & wandb
-        'save_dir': cfg.LOGGER.OUTPUT_DIR,
+    wandb_logger_params = {
         'name': cfg.CONFIG_NAME,
-
-        # wandb
         'project': cfg.PROJECT_NAME,
         'offline': True
     }
-    wandb_logger = WandbLogger(**logger_params)
-    csv_logger = CSVLogger(**logger_params)
-    tb_logger = TensorBoardLogger(**logger_params)
+    wandb_logger = WandbLogger(**wandb_logger_params)
+
+    csv_logger_params = {
+        'save_dir': cfg.LOGGER.OUTPUT_DIR,
+        'name': cfg.CONFIG_NAME,
+    }
+    csv_logger = CSVLogger(**csv_logger_params)
+
+    tb_logger_params = {
+        'save_dir': cfg.LOGGER.OUTPUT_DIR,
+        'name': cfg.CONFIG_NAME,
+    }
+    tb_logger = TensorBoardLogger(**tb_logger_params)
 
 
     print("Building callback...")
@@ -125,7 +131,7 @@ def main(cfg):
 
     print("Training model...")
     training_params = {
-        'enable_progress_bar': False,
+        # 'enable_progress_bar': False,
         'profiler': "simple",
         "logger": [wandb_logger, csv_logger, tb_logger],
         'callbacks': [tqdm_callback, checkpoint_callback],
