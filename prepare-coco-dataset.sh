@@ -1,6 +1,6 @@
 mkdir -p data/coco
 
-STAGE_DIR=coco
+STAGE_DIR=data/coco
 
 echo "Downloading train2017.zip"
 wget -O $STAGE_DIR/train2017.zip http://images.cocodataset.org/zips/train2017.zip
