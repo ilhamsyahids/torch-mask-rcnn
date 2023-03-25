@@ -78,5 +78,6 @@ _C.OPTIMIZER.NESTEROV = False
 
 _C.LOGGER = CN()
 _C.LOGGER.OUTPUT_DIR = "logs"
+_C.LOGGER.VERSION = 1
 
 cfg = _C

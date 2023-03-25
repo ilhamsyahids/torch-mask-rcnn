@@ -65,35 +65,40 @@ def main(cfg):
     val_dataloader = torch.utils.data.DataLoader(**val_dataloader_params)
 
     print("Building logger...")
+    utils.mkdir(cfg.LOGGER.OUTPUT_DIR + "/wandb")
+
     wandb_logger_params = {
         'name': cfg.CONFIG_NAME,
         'project': cfg.PROJECT_NAME,
+        'save_dir': cfg.LOGGER.OUTPUT_DIR,
         'offline': True
     }
     wandb_logger = WandbLogger(**wandb_logger_params)
 
     csv_logger_params = {
-        'save_dir': cfg.LOGGER.OUTPUT_DIR,
         'name': cfg.CONFIG_NAME,
+        'save_dir': cfg.LOGGER.OUTPUT_DIR,
+        'version': cfg.LOGGER.VERSION,
     }
     csv_logger = CSVLogger(**csv_logger_params)
 
     tb_logger_params = {
-        'save_dir': cfg.LOGGER.OUTPUT_DIR,
         'name': cfg.CONFIG_NAME,
+        'save_dir': cfg.LOGGER.OUTPUT_DIR,
+        'version': cfg.LOGGER.VERSION,
     }
     tb_logger = TensorBoardLogger(**tb_logger_params)
 
 
     print("Building callback...")
     checkpoint_params = {
-        'monitor': "val_loss",
+        # 'monitor': "val_loss",
         'mode': 'min',
-        'every_n_train_steps': 0,
         'every_n_epochs': 1,
+        'save_top_k': -1, # save all
         'dirpath': cfg.OUTPUT_DIR,
     }
-    checkpoint_callback = ModelCheckpoint(**checkpoint_params)  # Model check
+    checkpoint_callback = ModelCheckpoint(**checkpoint_params)
 
     tqdm_params = {
         'refresh_rate': cfg.PRINT_FREQ,
@@ -138,6 +143,7 @@ def main(cfg):
         'accelerator': cfg.ACCELERATOR.NAME,
         'devices': cfg.ACCELERATOR.DEVICES,
         'max_epochs': cfg.EPOCHS,
+        'num_sanity_val_steps': 0,
     }
     fit_params = {
         'model': model_lightning,
@@ -152,6 +158,6 @@ def main(cfg):
 if __name__ == "__main__":
     args = get_args_parser().parse_args()
     if args.config_file:
-        cfg = cfg.merge_from_file(args.config_file)
+        cfg.merge_from_file(args.config_file)
 
     main(cfg)
