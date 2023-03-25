@@ -1,6 +1,14 @@
-mkdir -p data/coco
 
-STAGE_DIR=data/coco
+if [ -z "$1" ]
+then
+    echo "Please pass the path to the directory where you want to download the dataset"
+    exit 1
+fi
+
+# STAGE_DIR=data/coco
+STAGE_DIR=$1
+
+mkdir -p $1
 
 echo "Downloading train2017.zip"
 wget -O $STAGE_DIR/train2017.zip http://images.cocodataset.org/zips/train2017.zip
