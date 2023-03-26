@@ -110,9 +110,11 @@ def main(cfg):
     print("Building model...")
     module_params = {
         'cfg': cfg,
-        'val_dataloader': val_dataloader,
     }
     model = models.Mask_RCNN(**module_params)
+
+    if cfg.METRICS.COCO_EVALUATOR:
+        model.set_coco_api_from_dataset(val_dataloader)
 
     print("Training model...")
     training_params = {
@@ -124,6 +126,7 @@ def main(cfg):
         'accelerator': cfg.ACCELERATOR.NAME,
         'devices': cfg.ACCELERATOR.DEVICES,
         'max_epochs': cfg.EPOCHS,
+        'strategy': cfg.STRATEGY,
         'num_sanity_val_steps': 0,
     }
     fit_params = {
@@ -140,5 +143,6 @@ if __name__ == "__main__":
     args = get_args_parser().parse_args()
     if args.config_file:
         cfg.merge_from_file(args.config_file)
+        cfg.merge_from_list(["CONFIG_FILE", args.config_file])
 
     main(cfg)

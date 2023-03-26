@@ -4,6 +4,7 @@ import pytorch_lightning as pl
 from pprint import pprint
 
 import torch
+import torch.utils.data
 import torchvision.models
 from torchvision.models.detection import MaskRCNN
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
@@ -75,7 +76,7 @@ def get_maskrcnn(version: str = 'v2', pretrained: bool = True, pretrained_backbo
 
 
 class Mask_RCNN(pl.LightningModule):
-    def __init__(self, cfg, val_dataloader):
+    def __init__(self, cfg):
         """
         Constructor for the Mask_RCNN class
         :param cfg: yacs configuration that contains all the necessary information about the available backbones
@@ -84,7 +85,7 @@ class Mask_RCNN(pl.LightningModule):
         """
         super(Mask_RCNN, self).__init__()
 
-        # self.save_hyperparameters()
+        self.save_hyperparameters()
 
         self.cfg = cfg
 
@@ -95,8 +96,6 @@ class Mask_RCNN(pl.LightningModule):
             'pretrained_backbone': cfg.MODEL.PRETRAINED_BACKBONE,
         }
         self.model = get_maskrcnn(**model_params)
-
-        self.val_data_loader = val_dataloader
 
         if not self._use_coco_evaluator():
             self.metric_bbox = MeanAveragePrecision(class_metrics=True)
@@ -159,13 +158,17 @@ class Mask_RCNN(pl.LightningModule):
             iou_types.append("keypoints")
         return iou_types
 
+    def set_coco_api_from_dataset(self, val_dataloader: torch.utils.data.DataLoader):
+        if self._use_coco_evaluator():
+            self.coco = get_coco_api_from_dataset(val_dataloader.dataset)
+            self.iou_types = self._get_iou_types(self.model)
+            self.coco_evaluator = CocoEvaluator(self.coco, self.iou_types)
+            self.cpu_device = torch.device("cpu")
+
 
     def on_validation_epoch_start(self) -> None:
         if self._use_coco_evaluator():
-            coco = get_coco_api_from_dataset(self.val_data_loader.dataset)
-            iou_types = self._get_iou_types(self.model)
-            self.coco_evaluator = CocoEvaluator(coco, iou_types)
-            self.cpu_device = torch.device("cpu")
+            self.coco_evaluator = CocoEvaluator(self.coco, self.iou_types)
 
 
     def validation_step(self, val_batch, batch_idx) -> float:
