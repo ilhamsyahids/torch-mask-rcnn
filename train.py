@@ -10,7 +10,6 @@ from pytorch_lightning.callbacks import ModelCheckpoint, TQDMProgressBar
 import utils
 import dataset
 import models
-import optimizers
 
 from config import cfg
 
@@ -74,6 +73,7 @@ def main(cfg):
         'offline': True
     }
     wandb_logger = WandbLogger(**wandb_logger_params)
+    wandb_logger.log_hyperparams(cfg)
 
     csv_logger_params = {
         'name': cfg.CONFIG_NAME,
@@ -92,7 +92,7 @@ def main(cfg):
 
     print("Building callback...")
     checkpoint_params = {
-        # 'monitor': "val_loss",
+        'monitor': "val_loss",
         'mode': 'min',
         'every_n_epochs': 1,
         'save_top_k': -1, # save all
@@ -107,32 +107,10 @@ def main(cfg):
 
 
     print("Building model...")
-    model_params = {
-        'num_classes': cfg.DATASET.NUM_CLASSES,
-        'version': cfg.MODEL.VERSION,
-        'pretrained': cfg.MODEL.PRETRAINED,
-        'pretrained_backbone': cfg.MODEL.PRETRAINED_BACKBONE,
-    }
-    model = models.get_maskrcnn(**model_params)
-
-    print("Building optimizer...")
-    optimizer_params = {
-        'opt': cfg.OPTIMIZER.NAME,
-        'parameters': model.parameters(),
-        'lr': cfg.OPTIMIZER.LR,
-        'weight_decay': cfg.OPTIMIZER.WEIGHT_DECAY,
-        'nesterov': cfg.OPTIMIZER.NESTEROV,
-        'momentum': cfg.OPTIMIZER.MOMENTUM,
-    }
-    optimizer = optimizers.get_optimizer(**optimizer_params)
-
-    print("Building lightning model...")
     module_params = {
         'cfg': cfg,
-        'model': model,
-        'optimizer': optimizer,
     }
-    model_lightning = models.Mask_RCNN_Lightning(**module_params)
+    model = models.Mask_RCNN(**module_params)
 
     print("Training model...")
     training_params = {
@@ -146,7 +124,7 @@ def main(cfg):
         'num_sanity_val_steps': 0,
     }
     fit_params = {
-        'model': model_lightning,
+        'model': model,
         'train_dataloaders': train_dataloader,
         'val_dataloaders': val_dataloader,
     }

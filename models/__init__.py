@@ -1,2 +1,2 @@
 
-from .mask_rcnn import get_maskrcnn, Mask_RCNN_Lightning
+from .mask_rcnn import get_maskrcnn, Mask_RCNN

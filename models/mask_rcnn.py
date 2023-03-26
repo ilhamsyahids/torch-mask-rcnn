@@ -1,5 +1,6 @@
 import torch
 import pytorch_lightning as pl
+from pprint import pprint
 
 from torchmetrics.detection.mean_ap import MeanAveragePrecision
 
@@ -10,6 +11,8 @@ from torchvision.models.detection import MaskRCNN
 from torchvision.models.detection import maskrcnn_resnet50_fpn, maskrcnn_resnet50_fpn_v2
 from torchvision.models.detection import MaskRCNN_ResNet50_FPN_Weights, MaskRCNN_ResNet50_FPN_V2_Weights
 from torchvision.models.resnet import ResNet50_Weights
+
+import optimizers
 
 
 def get_maskrcnn(version: str = 'v2', pretrained: bool = True, pretrained_backbone: bool = True, num_classes: int = 91) -> MaskRCNN:
@@ -65,27 +68,29 @@ def get_maskrcnn(version: str = 'v2', pretrained: bool = True, pretrained_backbo
 
 
 
-class Mask_RCNN_Lightning(pl.LightningModule):
-
-    def __init__(self,
-                 cfg,
-                 model: MaskRCNN,
-                 optimizer: torch.optim.Optimizer,
-                 ):
+class Mask_RCNN(pl.LightningModule):
+    def __init__(self, cfg):
         """
         Constructor for the Mask_RCNN class
         :param cfg: yacs configuration that contains all the necessary information about the available backbones
         :param model: the model
         :param optimizer: the optimizer
         """
-        super(Mask_RCNN_Lightning, self).__init__()
-
-        self.cfg = cfg
-        self.model = model
-        self.optimizer = optimizer
-        self.metric = MeanAveragePrecision(class_metrics=True)
+        super(Mask_RCNN, self).__init__()
 
         self.save_hyperparameters()
+
+        self.cfg = cfg
+
+        model_params = {
+            'num_classes': cfg.DATASET.NUM_CLASSES,
+            'version': cfg.MODEL.VERSION,
+            'pretrained': cfg.MODEL.PRETRAINED,
+            'pretrained_backbone': cfg.MODEL.PRETRAINED_BACKBONE,
+        }
+        self.model = get_maskrcnn(**model_params)
+
+        self.metric = MeanAveragePrecision(class_metrics=True)
 
     def forward(self, inputs, targets=None):
         return self.model(inputs, targets)
@@ -94,11 +99,7 @@ class Mask_RCNN_Lightning(pl.LightningModule):
         self.training_step_outputs = []
 
     def training_step(self, train_batch, batch_idx) -> float:
-        images, targets = train_batch
-
-        targets = [{k: v for k, v in t.items()} for t in targets]
-        loss_dict = self.model(images, targets)
-        losses = sum(loss for loss in loss_dict.values())
+        losses = self._get_loss(train_batch)
 
         self.training_step_outputs.append(losses)
 
@@ -115,22 +116,40 @@ class Mask_RCNN_Lightning(pl.LightningModule):
         self.validation_step_outputs = []
 
     def validation_step(self, val_batch, batch_idx) -> float:
-        images, targets = val_batch
-
-        targets = [{k: v for k, v in t.items()} for t in targets]
-        loss_dict = self.model(images, targets)
-        va_losses = sum(loss for loss in loss_dict.values())
+        va_losses = self._get_loss(val_batch, print_metrics=True)
 
         self.validation_step_outputs.append(va_losses)
 
         return va_losses
 
-    def validation_epoch_end(self, validation_step_outputs) -> dict:
-        epoch_losses = torch.tensor([batch_loss.item() for batch_loss in validation_step_outputs])
+    def on_validation_epoch_end(self) -> None:
+        epoch_losses = torch.tensor([batch_loss.item() for batch_loss in self.validation_step_outputs])
         loss_mean = torch.mean(epoch_losses)
         self.log('val_loss', loss_mean)
 
         self.validation_step_outputs.clear()
 
+    def _get_loss(self, batch, print_metrics=False):
+        images, targets = batch
+
+        targets = [{k: v for k, v in t.items()} for t in targets]
+        loss_dict = self.model(images, targets)
+        losses = sum(loss for loss in loss_dict.values())
+
+        if print_metrics:
+            self.metric.update(targets, self.model(images, targets))
+            pprint(self.metric.compute())
+
+        return losses
+
     def configure_optimizers(self):
-        return self.optimizer
+        optimizer_params = {
+            'parameters': self.parameters(),
+            'opt': self.cfg.OPTIMIZER.NAME,
+            'lr': self.cfg.OPTIMIZER.LR,
+            'weight_decay': self.cfg.OPTIMIZER.WEIGHT_DECAY,
+            'nesterov': self.cfg.OPTIMIZER.NESTEROV,
+            'momentum': self.cfg.OPTIMIZER.MOMENTUM,
+        }
+        optimizer = optimizers.get_optimizer(**optimizer_params)
+        return optimizer
