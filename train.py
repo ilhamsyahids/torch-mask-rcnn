@@ -70,7 +70,7 @@ def main(cfg):
         'name': cfg.CONFIG_NAME,
         'project': cfg.PROJECT_NAME,
         'save_dir': cfg.LOGGER.OUTPUT_DIR,
-        'offline': True
+        # 'offline': True
     }
     wandb_logger = WandbLogger(**wandb_logger_params)
     wandb_logger.log_hyperparams(cfg)
@@ -92,12 +92,13 @@ def main(cfg):
 
     print("Building callback...")
     checkpoint_params = {
-        'monitor': "val_loss",
-        'mode': 'min',
         'every_n_epochs': 1,
         'save_top_k': -1, # save all
         'dirpath': cfg.OUTPUT_DIR,
     }
+    if not cfg.METRICS.COCO_EVALUATOR:
+        checkpoint_params['monitor'] = 'val_loss'
+        checkpoint_params['mode'] = 'min'
     checkpoint_callback = ModelCheckpoint(**checkpoint_params)
 
     tqdm_params = {
@@ -109,6 +110,7 @@ def main(cfg):
     print("Building model...")
     module_params = {
         'cfg': cfg,
+        'val_dataloader': val_dataloader,
     }
     model = models.Mask_RCNN(**module_params)
 
@@ -118,6 +120,7 @@ def main(cfg):
         'profiler': "simple",
         "logger": [wandb_logger, csv_logger, tb_logger],
         'callbacks': [tqdm_callback, checkpoint_callback],
+        'precision': cfg.ACCELERATOR.PRECISION,
         'accelerator': cfg.ACCELERATOR.NAME,
         'devices': cfg.ACCELERATOR.DEVICES,
         'max_epochs': cfg.EPOCHS,
