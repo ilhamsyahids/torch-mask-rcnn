@@ -1,0 +1,9 @@
+PROJECT_NAME: "Mask R-CNN Training GPU"
+
+CONFIG_NAME: "GPU-Single-Baseline"
+
+DATASET:
+  DATA_PATH: "../dist-mask-rccn-coco/data/coco"
+
+ACCELERATOR:
+  DEVICES: 1

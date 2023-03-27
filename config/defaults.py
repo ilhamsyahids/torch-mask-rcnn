@@ -13,7 +13,10 @@ _C = CN()
 # -----------------------------------------------------------------------------
 
 _C.PROJECT_NAME = "PyTorch Mask R-CNN Training"
+
 _C.CONFIG_NAME = "Default"
+_C.CONFIG_FILE = "config/defaults.py"
+
 _C.OUTPUT_DIR = "checkpoint"
 
 _C.EPOCHS = 1

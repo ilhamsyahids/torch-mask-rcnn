@@ -117,9 +117,14 @@ class Mask_RCNN(pl.LightningModule):
 
     def on_train_epoch_start(self) -> None:
         self.training_step_outputs = []
+        self.epoch_time = time.time()
 
 
     def on_train_epoch_end(self) -> None:
+        iter_time = time.time() - self.epoch_time
+        iter_time_str = str(datetime.timedelta(seconds=int(iter_time)))
+        pprint(f"Total time on {self.current_epoch} epoch: {iter_time_str}")
+
         epoch_losses = torch.tensor([batch_loss.item() for batch_loss in self.training_step_outputs])
         loss_mean = torch.mean(epoch_losses)
 
@@ -203,8 +208,6 @@ class Mask_RCNN(pl.LightningModule):
             self.coco_evaluator.synchronize_between_processes()
             self.coco_evaluator.accumulate()
             self.coco_evaluator.summarize()
-            pprint(self.coco_evaluator.coco_eval)
-            pprint(self.coco_evaluator.coco_eval['bbox'])
         else:
             pprint(self.metric_bbox.compute())
 

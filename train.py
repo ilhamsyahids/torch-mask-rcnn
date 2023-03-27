@@ -25,6 +25,32 @@ def main(cfg):
     
     utils.init_random_seed()
 
+    print("Building logger...")
+    utils.mkdir(cfg.LOGGER.OUTPUT_DIR + "/wandb")
+
+    wandb_logger_params = {
+        'name': cfg.CONFIG_NAME,
+        'project': cfg.PROJECT_NAME,
+        'save_dir': cfg.LOGGER.OUTPUT_DIR,
+        # 'offline': True
+    }
+    wandb_logger = WandbLogger(**wandb_logger_params)
+    wandb_logger.log_hyperparams(cfg)
+
+    csv_logger_params = {
+        'name': cfg.CONFIG_NAME,
+        'save_dir': cfg.LOGGER.OUTPUT_DIR,
+        'version': cfg.LOGGER.VERSION,
+    }
+    csv_logger = CSVLogger(**csv_logger_params)
+
+    tb_logger_params = {
+        'name': cfg.CONFIG_NAME,
+        'save_dir': cfg.LOGGER.OUTPUT_DIR,
+        'version': cfg.LOGGER.VERSION,
+    }
+    tb_logger = TensorBoardLogger(**tb_logger_params)
+
     print("Loading dataset...")
 
     train_dataset, val_dataset = dataset.get_datasets(cfg.DATASET.NAME, cfg.DATASET)
@@ -63,33 +89,6 @@ def main(cfg):
     train_dataloader = torch.utils.data.DataLoader(**train_dataloader_params)
     val_dataloader = torch.utils.data.DataLoader(**val_dataloader_params)
 
-    print("Building logger...")
-    utils.mkdir(cfg.LOGGER.OUTPUT_DIR + "/wandb")
-
-    wandb_logger_params = {
-        'name': cfg.CONFIG_NAME,
-        'project': cfg.PROJECT_NAME,
-        'save_dir': cfg.LOGGER.OUTPUT_DIR,
-        # 'offline': True
-    }
-    wandb_logger = WandbLogger(**wandb_logger_params)
-    wandb_logger.log_hyperparams(cfg)
-
-    csv_logger_params = {
-        'name': cfg.CONFIG_NAME,
-        'save_dir': cfg.LOGGER.OUTPUT_DIR,
-        'version': cfg.LOGGER.VERSION,
-    }
-    csv_logger = CSVLogger(**csv_logger_params)
-
-    tb_logger_params = {
-        'name': cfg.CONFIG_NAME,
-        'save_dir': cfg.LOGGER.OUTPUT_DIR,
-        'version': cfg.LOGGER.VERSION,
-    }
-    tb_logger = TensorBoardLogger(**tb_logger_params)
-
-
     print("Building callback...")
     checkpoint_params = {
         'every_n_epochs': 1,
@@ -112,6 +111,8 @@ def main(cfg):
         'cfg': cfg,
     }
     model = models.Mask_RCNN(**module_params)
+
+    wandb_logger.watch(model.model, log="all")
 
     if cfg.METRICS.COCO_EVALUATOR:
         model.set_coco_api_from_dataset(val_dataloader)
