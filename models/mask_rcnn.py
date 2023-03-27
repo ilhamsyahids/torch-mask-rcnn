@@ -97,6 +97,9 @@ class Mask_RCNN(pl.LightningModule):
         }
         self.model = get_maskrcnn(**model_params)
 
+        self.train_batch_size = cfg.DATALOADER.TRAIN_BATCH_SIZE
+        self.val_batch_size = cfg.DATALOADER.VAL_BATCH_SIZE
+
         if not self._use_coco_evaluator():
             self.metric_bbox = MeanAveragePrecision(class_metrics=True)
 
@@ -112,7 +115,7 @@ class Mask_RCNN(pl.LightningModule):
     def on_train_end(self) -> None:
         total_time = time.time() - self.start_time
         total_time_str = str(datetime.timedelta(seconds=int(total_time)))
-        pprint(f"Training time {total_time_str}")
+        print(f"Training time {total_time_str}")
 
 
     def on_train_epoch_start(self) -> None:
@@ -123,12 +126,16 @@ class Mask_RCNN(pl.LightningModule):
     def on_train_epoch_end(self) -> None:
         iter_time = time.time() - self.epoch_time
         iter_time_str = str(datetime.timedelta(seconds=int(iter_time)))
-        pprint(f"Total time on {self.current_epoch} epoch: {iter_time_str}")
+        print(f"Total time on epoch {self.current_epoch}: {iter_time_str}")
+
+        total_time = time.time() - self.start_time
+        total_time_str = str(datetime.timedelta(seconds=int(total_time)))
+        print(f"Total time on {self.current_epoch} epoch: {total_time_str}")
 
         epoch_losses = torch.tensor([batch_loss.item() for batch_loss in self.training_step_outputs])
         loss_mean = torch.mean(epoch_losses)
 
-        self.log('training_loss', loss_mean, on_epoch=True)
+        self.log('training_loss', loss_mean, prog_bar=True, logger=True, on_epoch=True, batch_size=self.train_batch_size)
 
         self.training_step_outputs.clear()
 
@@ -144,8 +151,8 @@ class Mask_RCNN(pl.LightningModule):
         losses_reduced = sum(loss for loss in loss_dict_reduced.values())
         loss_value = losses_reduced.item()
 
-        self.log('training_step_loss', loss_value)
-        self.log_dict(loss_dict_reduced)
+        self.log('training_step_loss', loss_value, on_step=True, batch_size=len(train_batch))
+        self.log_dict(loss_dict_reduced, on_step=True, prog_bar=True, logger=True, batch_size=len(train_batch))
 
         self.training_step_outputs.append(losses)
 
@@ -188,7 +195,7 @@ class Mask_RCNN(pl.LightningModule):
             outputs = [{k: v for k, v in t.items()} for t in outputs]
 
         model_time = time.time() - model_time
-        self.log('model_time', model_time)
+        self.log('model_time', model_time, on_step=True, batch_size=len(val_batch))
 
         res = {target["image_id"].item(): output for target, output in zip(targets, outputs)}
 
@@ -196,7 +203,7 @@ class Mask_RCNN(pl.LightningModule):
             evaluator_time = time.time()
             self.coco_evaluator.update(res)
             evaluator_time = time.time() - evaluator_time
-            self.log('evaluator_time', evaluator_time)
+            self.log('evaluator_time', evaluator_time, on_step=True, batch_size=len(val_batch))
         else:
             self.metric_bbox.update(outputs, targets)
         
