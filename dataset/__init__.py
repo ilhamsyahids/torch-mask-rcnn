@@ -1,7 +1,7 @@
 import torchvision
 
 from . import presets
-from .coco import get_coco
+from .coco import get_coco, get_class_names
 from .transforms import SimpleCopyPaste, InterpolationMode
 
 
@@ -20,10 +20,11 @@ def get_datasets(name, cfg):
     if name == 'coco':
         train = get_coco(cfg.DATA_PATH, 'train', get_transform(train=True, cfg=cfg))
         val = get_coco(cfg.DATA_PATH, 'val', get_transform(train=False, cfg=cfg))
+        class_names = get_class_names()
     else:
         raise RuntimeError("Only COCO dataset is supported for now.")
 
-    return train, val
+    return train, val, class_names
 
 
 def collate_fn(batch):

@@ -11,6 +11,7 @@ import utils
 import dataset
 import models
 
+from loggers import LogPredictionsCallback
 from config import cfg
 
 def get_args_parser(add_help=True):
@@ -21,7 +22,7 @@ def get_args_parser(add_help=True):
 
 def main(cfg):
     if cfg.OUTPUT_DIR:
-        utils.mkdir(cfg.OUTPUT_DIR)
+        utils.mkdir(cfg.OUTPUT_DIR + '/' + cfg.CONFIG_NAME)
     
     utils.init_random_seed()
 
@@ -53,7 +54,7 @@ def main(cfg):
 
     print("Loading dataset...")
 
-    train_dataset, val_dataset = dataset.get_datasets(cfg.DATASET.NAME, cfg.DATASET)
+    train_dataset, val_dataset, class_names = dataset.get_datasets(cfg.DATASET.NAME, cfg.DATASET)
 
     train_collate_fn = dataset.collate_fn
     if cfg.USE_SIMPLE_COPY_PASTE:
@@ -93,7 +94,7 @@ def main(cfg):
     checkpoint_params = {
         'every_n_epochs': 1,
         'save_top_k': -1, # save all
-        'dirpath': cfg.OUTPUT_DIR,
+        'dirpath': cfg.OUTPUT_DIR + '/' + cfg.CONFIG_NAME,
     }
     if not cfg.METRICS.COCO_EVALUATOR:
         checkpoint_params['monitor'] = 'val_loss'
@@ -104,6 +105,12 @@ def main(cfg):
         'refresh_rate': cfg.PRINT_FREQ,
     }
     tqdm_callback = TQDMProgressBar(**tqdm_params)
+
+    pred_params = {
+        'wandb_logger': wandb_logger,
+        'class_names': class_names,
+    }
+    pred_callback = LogPredictionsCallback(**pred_params)
 
 
     print("Building model...")
@@ -122,7 +129,7 @@ def main(cfg):
         # 'enable_progress_bar': False,
         'profiler': "simple",
         "logger": [wandb_logger, csv_logger, tb_logger],
-        'callbacks': [tqdm_callback, checkpoint_callback],
+        'callbacks': [pred_callback, tqdm_callback, checkpoint_callback],
         'precision': cfg.ACCELERATOR.PRECISION,
         'accelerator': cfg.ACCELERATOR.NAME,
         'devices': cfg.ACCELERATOR.DEVICES,

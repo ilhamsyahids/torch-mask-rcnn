@@ -199,6 +199,8 @@ class Mask_RCNN(pl.LightningModule):
             self.log('evaluator_time', evaluator_time)
         else:
             self.metric_bbox.update(outputs, targets)
+        
+        return outputs
     
     def _use_coco_evaluator(self):
         return self.cfg.METRICS.COCO_EVALUATOR
