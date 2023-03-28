@@ -18,7 +18,7 @@ class LogPredictionsCallback(Callback):
             img_list = img_list[:n]
             targets = targets[:n]
 
-            columns = ['ID', 'Image']
+            columns = ['Epoch', 'Sample No', 'Image']
             data = []
 
             filtered_output = self._filter_model_output(outputs, self.threshold)
@@ -37,7 +37,7 @@ class LogPredictionsCallback(Callback):
                     boxes=wboxes,
                 )
 
-                data.append([index, img])
+                data.append([trainer.current_epoch, index + 1, img])
 
             if len(data) > 0:
                 self._wandb_logger.log_table(key='Sample Val Pred', columns=columns, data=data)
