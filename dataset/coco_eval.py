@@ -1,13 +1,17 @@
+import itertools
 import torch
 import copy
 import io
 import numpy as np
 import pycocotools.mask as mask_util
 
+from tabulate import tabulate
 from contextlib import redirect_stdout
 from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
+
 from utils.dist import all_gather
+from .coco import COCO_CLASS_NAMES
 
 
 class CocoEvaluator:
@@ -41,19 +45,96 @@ class CocoEvaluator:
 
             self.eval_imgs[iou_type].append(eval_imgs)
 
+
     def synchronize_between_processes(self):
         for iou_type in self.iou_types:
             self.eval_imgs[iou_type] = np.concatenate(self.eval_imgs[iou_type], 2)
             create_common_coco_eval(self.coco_eval[iou_type], self.img_ids, self.eval_imgs[iou_type])
 
+
+    def _per_class_AR_table(self, coco_eval, class_names=COCO_CLASS_NAMES, headers=["class", "AR"], colums=6):
+        per_class_AR = {}
+        recalls = coco_eval.eval["recall"]
+        # dimension of recalls: [TxKxAxM]
+        # recall has dims (iou, cls, area range, max dets)
+        assert len(class_names) == recalls.shape[1]
+
+        for idx, name in enumerate(class_names):
+            recall = recalls[:, idx, 0, -1]
+            recall = recall[recall > -1]
+            ar = np.mean(recall) if recall.size else float("nan")
+            per_class_AR[name] = float(ar * 100)
+
+        num_cols = min(colums, len(per_class_AR) * len(headers))
+        result_pair = [x for pair in per_class_AR.items() for x in pair]
+        row_pair = itertools.zip_longest(*[result_pair[i::num_cols] for i in range(num_cols)])
+        table_headers = headers * (num_cols // len(headers))
+        table = tabulate(
+            row_pair, tablefmt="pipe", floatfmt=".3f", headers=table_headers, numalign="left",
+        )
+        return table, per_class_AR
+
+
+    def _per_class_AP_table(self, coco_eval, class_names=COCO_CLASS_NAMES, headers=["class", "AP"], colums=6):
+        per_class_AP = {}
+        precisions = coco_eval.eval["precision"]
+        # dimension of precisions: [TxRxKxAxM]
+        # precision has dims (iou, recall, cls, area range, max dets)
+        assert len(class_names) == precisions.shape[2]
+
+        for idx, name in enumerate(class_names):
+            # area range index 0: all area ranges
+            # max dets index -1: typically 100 per image
+            precision = precisions[:, :, idx, 0, -1]
+            precision = precision[precision > -1]
+            ap = np.mean(precision) if precision.size else float("nan")
+            per_class_AP[name] = float(ap * 100)
+
+        num_cols = min(colums, len(per_class_AP) * len(headers))
+        result_pair = [x for pair in per_class_AP.items() for x in pair]
+        row_pair = itertools.zip_longest(*[result_pair[i::num_cols] for i in range(num_cols)])
+        table_headers = headers * (num_cols // len(headers))
+        table = tabulate(
+            row_pair, tablefmt="pipe", floatfmt=".3f", headers=table_headers, numalign="left",
+        )
+        return table, per_class_AP
+
+
     def accumulate(self):
         for coco_eval in self.coco_eval.values():
             coco_eval.accumulate()
 
+
     def summarize(self):
+        res = dict()
         for iou_type, coco_eval in self.coco_eval.items():
-            print(f"IoU metric: {iou_type}")
-            coco_eval.summarize()
+            redirect_string = io.StringIO()
+
+            info = f"IoU metric: {iou_type}\n"
+
+            with redirect_stdout(redirect_string):
+                coco_eval.summarize()
+
+            cat_ids = list(coco_eval.cocoGt.cats.keys())
+            cat_names = [coco_eval.cocoGt.cats[catId]['name'] for catId in sorted(cat_ids)]
+
+            info += redirect_string.getvalue()
+            AP_table, per_class_AP_dict = self._per_class_AP_table(coco_eval, class_names=cat_names)
+            info += "Per class AP:\n" + AP_table + "\n"
+
+            AR_table, per_class_AR_dict = self._per_class_AR_table(coco_eval, class_names=cat_names)
+            info += "Per class AR:\n" + AR_table + "\n"
+
+            res[iou_type] = {
+                "map": coco_eval.stats[0],
+                "map_50": coco_eval.stats[1],
+                "mar": coco_eval.stats[8],
+                "per_class_AP_dict": per_class_AP_dict,
+                "per_class_AR_dict": per_class_AR_dict,
+                "table": info
+            }
+
+        return res
 
     def prepare(self, predictions, iou_type):
         if iou_type == "bbox":

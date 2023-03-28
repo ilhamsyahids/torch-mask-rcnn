@@ -91,6 +91,5 @@ _C.LOGGER.VERSION = 1
 # -----------------------------------------------------------------------------
 
 _C.METRICS = CN()
-_C.METRICS.COCO_EVALUATOR = True
 
 cfg = _C

@@ -33,6 +33,7 @@ def main(cfg):
         'name': cfg.CONFIG_NAME,
         'project': cfg.PROJECT_NAME,
         'save_dir': cfg.LOGGER.OUTPUT_DIR,
+        'log_model': True # log model at the end of training
         # 'offline': True
     }
     wandb_logger = WandbLogger(**wandb_logger_params)
@@ -63,21 +64,11 @@ def main(cfg):
 
         train_collate_fn = dataset.copypaste_collate_fn
 
-    # required for TPU support
-    train_sampler = None
-    if cfg.ACCELERATOR.NAME == 'tpu':
-        import torch_xla.core.xla_model as xm
-
-        train_sampler = torch.utils.data.distributed.DistributedSampler(
-            train_dataset, num_replicas=xm.xrt_world_size(), rank=xm.get_ordinal(), shuffle=True
-        )
-    
     train_dataloader_params = {
         'dataset': train_dataset,
         'collate_fn': train_collate_fn,
         'num_workers': cfg.DATALOADER.WORKERS,
         'batch_size': cfg.DATALOADER.TRAIN_BATCH_SIZE,
-        'sampler': train_sampler,
     }
 
     val_dataloader_params = {
@@ -87,18 +78,27 @@ def main(cfg):
         'batch_size': cfg.DATALOADER.VAL_BATCH_SIZE,
     }
 
+    # required for TPU support
+    if cfg.ACCELERATOR.NAME == 'tpu':
+        import torch_xla.core.xla_model as xm
+
+        train_sampler = torch.utils.data.distributed.DistributedSampler(
+            train_dataset, num_replicas=xm.xrt_world_size(), rank=xm.get_ordinal(), shuffle=True
+        )
+
+        train_dataloader_params['sampler'] = train_sampler
+
     train_dataloader = torch.utils.data.DataLoader(**train_dataloader_params)
     val_dataloader = torch.utils.data.DataLoader(**val_dataloader_params)
 
     print("Building callback...")
     checkpoint_params = {
+        'monitor': 'map',
         'every_n_epochs': 1,
-        'save_top_k': -1, # save all
+        'mode': 'max',
+        # 'save_top_k': -1, # save all
         'dirpath': cfg.OUTPUT_DIR + '/' + cfg.CONFIG_NAME,
     }
-    if not cfg.METRICS.COCO_EVALUATOR:
-        checkpoint_params['monitor'] = 'val_loss'
-        checkpoint_params['mode'] = 'min'
     checkpoint_callback = ModelCheckpoint(**checkpoint_params)
 
     tqdm_params = {
@@ -118,11 +118,9 @@ def main(cfg):
         'cfg': cfg,
     }
     model = models.Mask_RCNN(**module_params)
+    model.set_coco_api_from_dataset(val_dataloader)
 
     wandb_logger.watch(model.model, log="all")
-
-    if cfg.METRICS.COCO_EVALUATOR:
-        model.set_coco_api_from_dataset(val_dataloader)
 
     print("Training model...")
     training_params = {

@@ -100,9 +100,6 @@ class Mask_RCNN(pl.LightningModule):
         self.train_batch_size = cfg.DATALOADER.TRAIN_BATCH_SIZE
         self.val_batch_size = cfg.DATALOADER.VAL_BATCH_SIZE
 
-        if not self._use_coco_evaluator():
-            self.metric_bbox = MeanAveragePrecision(class_metrics=True)
-
 
     def forward(self, inputs, targets=None):
         return self.model(inputs, targets)
@@ -115,7 +112,7 @@ class Mask_RCNN(pl.LightningModule):
     def on_train_end(self) -> None:
         total_time = time.time() - self.start_time
         total_time_str = str(datetime.timedelta(seconds=int(total_time)))
-        print(f"Training time {total_time_str}")
+        self.print(f"Training time {total_time_str}")
 
 
     def on_train_epoch_start(self) -> None:
@@ -126,11 +123,11 @@ class Mask_RCNN(pl.LightningModule):
     def on_train_epoch_end(self) -> None:
         iter_time = time.time() - self.epoch_time
         iter_time_str = str(datetime.timedelta(seconds=int(iter_time)))
-        print(f"Total time on epoch {self.current_epoch}: {iter_time_str}")
+        self.print(f"Total time on epoch {self.current_epoch}: {iter_time_str}")
 
         total_time = time.time() - self.start_time
         total_time_str = str(datetime.timedelta(seconds=int(total_time)))
-        print(f"Total time on {self.current_epoch} epoch: {total_time_str}")
+        self.print(f"Total time on {self.current_epoch} epoch: {total_time_str}")
 
         epoch_losses = torch.tensor([batch_loss.item() for batch_loss in self.training_step_outputs])
         loss_mean = torch.mean(epoch_losses)
@@ -151,8 +148,15 @@ class Mask_RCNN(pl.LightningModule):
         losses_reduced = sum(loss for loss in loss_dict_reduced.values())
         loss_value = losses_reduced.item()
 
-        self.log('training_step_loss', loss_value, on_step=True, batch_size=len(train_batch))
-        self.log_dict(loss_dict_reduced, on_step=True, prog_bar=True, logger=True, batch_size=len(train_batch))
+        params = {
+            "on_step": True,
+            "logger": True,
+            "batch_size": len(train_batch),
+            "prog_bar": True,
+        }
+
+        self.log('training_step_loss', loss_value, **params)
+        self.log_dict(loss_dict_reduced, **params)
 
         self.training_step_outputs.append(losses)
 
@@ -170,17 +174,16 @@ class Mask_RCNN(pl.LightningModule):
             iou_types.append("keypoints")
         return iou_types
 
+
     def set_coco_api_from_dataset(self, val_dataloader: torch.utils.data.DataLoader):
-        if self._use_coco_evaluator():
-            self.coco = get_coco_api_from_dataset(val_dataloader.dataset)
-            self.iou_types = self._get_iou_types(self.model)
-            self.coco_evaluator = CocoEvaluator(self.coco, self.iou_types)
-            self.cpu_device = torch.device("cpu")
+        self.coco = get_coco_api_from_dataset(val_dataloader.dataset)
+        self.iou_types = self._get_iou_types(self.model)
+        self.coco_evaluator = CocoEvaluator(self.coco, self.iou_types)
+        self.cpu_device = torch.device("cpu")
 
 
     def on_validation_epoch_start(self) -> None:
-        if self._use_coco_evaluator():
-            self.coco_evaluator = CocoEvaluator(self.coco, self.iou_types)
+        self.coco_evaluator = CocoEvaluator(self.coco, self.iou_types)
 
 
     def validation_step(self, val_batch, batch_idx) -> float:
@@ -189,60 +192,48 @@ class Mask_RCNN(pl.LightningModule):
         model_time = time.time()
 
         outputs = self.model(images)
-        if self._use_coco_evaluator():
-            outputs = [{k: v.to(self.cpu_device) for k, v in t.items()} for t in outputs]
-        else:
-            outputs = [{k: v for k, v in t.items()} for t in outputs]
+        outputs = [{k: v.to(self.cpu_device) for k, v in t.items()} for t in outputs]
 
         model_time = time.time() - model_time
-        self.log('model_time', model_time, on_step=True, batch_size=len(val_batch))
+        self.log('model_time', model_time, on_step=True, batch_size=len(val_batch), sync_dist=True, prog_bar=True)
 
         res = {target["image_id"].item(): output for target, output in zip(targets, outputs)}
 
-        if self._use_coco_evaluator():
+        if self.coco_evaluator is not None:
             evaluator_time = time.time()
             self.coco_evaluator.update(res)
             evaluator_time = time.time() - evaluator_time
-            self.log('evaluator_time', evaluator_time, on_step=True, batch_size=len(val_batch))
-        else:
-            self.metric_bbox.update(outputs, targets)
+            self.log('evaluator_time', evaluator_time, on_step=True, batch_size=len(val_batch), sync_dist=True, prog_bar=True)
         
         return outputs
-    
-    def _use_coco_evaluator(self):
-        return self.cfg.METRICS.COCO_EVALUATOR
+
 
     def on_validation_epoch_end(self) -> None:
-        if self._use_coco_evaluator():
-            self.coco_evaluator.synchronize_between_processes()
-            self.coco_evaluator.accumulate()
-            self.coco_evaluator.summarize()
-        else:
-            pprint(self.metric_bbox.compute())
+        if self.coco_evaluator is None:
+            return
+        
+        self.coco_evaluator.synchronize_between_processes()
+        self.coco_evaluator.accumulate()
+        summaries = self.coco_evaluator.summarize()
 
-            mAPs = {"val_" + k: v for k, v in self.metric_bbox.compute().items()}
-            mAPs_per_class = mAPs.pop("val_map_per_class")
-            mARs_per_class = mAPs.pop("val_mar_100_per_class")
+        for iou_type in self.iou_types:
+            summary = summaries[iou_type]
+            map = summary["map"]
+            map_50 = summary["map_50"]
+            mar = summary["mar"]
+            table = summary["table"]
 
-            self.log_dict(mAPs, sync_dist=True)
-            self.log('val_loss', mAPs['val_map'])
-            self.metric_bbox.reset()
+            self.print(table)
 
-            # skip since to many for logging
-            # self.log_dict(
-            #     {
-            #         f"val_map_{label}": value
-            #         for label, value in zip(self.categories, mAPs_per_class)
-            #     },
-            #     sync_dist=True,
-            # )
-            # self.log_dict(
-            #     {
-            #         f"val_mar_100_{label}": value
-            #         for label, value in zip(self.categories, mARs_per_class)
-            #     },
-            #     sync_dist=True,
-            # )
+            self.log('map', map, prog_bar=True, logger=True, sync_dist=True)
+            self.log('map_50', map_50, prog_bar=True, logger=True, sync_dist=True)
+            self.log('mar', mar, prog_bar=True, logger=True, sync_dist=True)
+
+            # skip since too many for logging
+            # per_class_AP_dict = summary["per_class_AP_dict"]
+            # per_class_AR_dict = summary["per_class_AR_dict"]
+            # self.log_dict(per_class_AP_dict)
+            # self.log_dict(per_class_AR_dict)
 
 
     def configure_optimizers(self):

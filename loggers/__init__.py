@@ -21,7 +21,7 @@ class LogPredictionsCallback(Callback):
             columns = ['ID', 'Image']
             data = []
 
-            filtered_output = self._filter_model_output(outputs=outputs, score_threshold=self.threshold)
+            filtered_output = self._filter_model_output(outputs, self.threshold)
 
             for index, (image, prediction) in enumerate(zip(img_list, filtered_output[:n])):
                 boxes = prediction.get('boxes')
@@ -43,7 +43,7 @@ class LogPredictionsCallback(Callback):
                 self._wandb_logger.log_table(key='Sample Val Pred', columns=columns, data=data)
 
 
-    def _filter_model_output(outputs, score_threshold):
+    def _filter_model_output(self, outputs, score_threshold):
         filtred_output = list()
         for image in outputs:
             filtred_image = dict()
