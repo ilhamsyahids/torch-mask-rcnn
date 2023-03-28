@@ -33,8 +33,8 @@ _C.STRATEGY = "auto"
 
 _C.ACCELERATOR = CN()
 _C.ACCELERATOR.NAME = "gpu"
-_C.ACCELERATOR.DEVICES = 8
-_C.ACCELERATOR.PRECISION = 16
+_C.ACCELERATOR.DEVICES = [0, 1, 2, 3, 4, 5, 6, 7]
+_C.ACCELERATOR.PRECISION = "16"
 
 # -----------------------------------------------------------------------------
 # Dataset
@@ -64,6 +64,9 @@ _C.MODEL = CN()
 _C.MODEL.VERSION = "v2"
 _C.MODEL.PRETRAINED = False
 _C.MODEL.PRETRAINED_BACKBONE = True
+
+_C.MODEL.USE_SYNC_BATCH_NORM = False
+_C.MODEL.DETERMINISTIC = False
 
 # -----------------------------------------------------------------------------
 # Optimizer

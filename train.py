@@ -140,6 +140,10 @@ def main(cfg):
         'train_dataloaders': train_dataloader,
         'val_dataloaders': val_dataloader,
     }
+    if cfg.MODEL.USE_SYNC_BATCH_NORM:
+        training_params['sync_batchnorm'] = True
+    if cfg.MODEL.DETERMINISTIC:
+        training_params['deterministic'] = True
 
     trainer = Trainer(**training_params)
     trainer.fit(**fit_params)
