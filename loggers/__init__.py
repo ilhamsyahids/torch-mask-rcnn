@@ -1,24 +1,27 @@
 import wandb
 
+import pytorch_lightning as pl
 from torchvision import transforms
+from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import Callback
  
 class LogPredictionsCallback(Callback):
 
-    def __init__(self, wandb_logger, class_names):
+    def __init__(self, wandb_logger: WandbLogger, class_names):
         super().__init__()
         self.threshold = 0.75
         self._wandb_logger = wandb_logger
         self.class_labels = {i: x for i, x in enumerate(class_names)}
+        self.columns = ['Epoch', 'Sample No', 'Image']
+        self.number_of_samples = 5
 
-    def on_validation_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):
+    def on_validation_batch_end(self, trainer: pl.Trainer, pl_module, outputs, batch, batch_idx):
         if batch_idx == 0:
-            n = 5
+            n = self.number_of_samples
             img_list, targets = batch
             img_list = img_list[:n]
             targets = targets[:n]
 
-            columns = ['Epoch', 'Sample No', 'Image']
             data = []
 
             filtered_output = self._filter_model_output(outputs, self.threshold)
@@ -40,7 +43,7 @@ class LogPredictionsCallback(Callback):
                 data.append([trainer.current_epoch, index + 1, img])
 
             if len(data) > 0:
-                self._wandb_logger.log_table(key='Sample Val Pred', columns=columns, data=data)
+                self._wandb_logger.log_table(key=f'sample_val_pred_epoch_{trainer.current_epoch}', columns=self.columns, data=data)
 
 
     def _filter_model_output(self, outputs, score_threshold):

@@ -93,7 +93,7 @@ def main(cfg):
 
     print("Building callback...")
     checkpoint_params = {
-        'monitor': 'map',
+        'monitor': 'map_bbox',
         'every_n_epochs': 1,
         'mode': 'max',
         # 'save_top_k': -1, # save all

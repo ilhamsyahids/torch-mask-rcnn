@@ -119,6 +119,12 @@ class Mask_RCNN(pl.LightningModule):
         self.training_step_outputs = []
         self.epoch_time = time.time()
 
+    def print(self, *args, **kwargs) -> None:
+        """
+        Overriding for not printing in progress_bar
+        """
+        if self.trainer.is_global_zero:
+            print(*args, **kwargs)
 
     def on_train_epoch_end(self) -> None:
         iter_time = time.time() - self.epoch_time
@@ -132,7 +138,13 @@ class Mask_RCNN(pl.LightningModule):
         epoch_losses = torch.tensor([batch_loss.item() for batch_loss in self.training_step_outputs])
         loss_mean = torch.mean(epoch_losses)
 
-        self.log('training_loss', loss_mean, prog_bar=True, logger=True, on_epoch=True, batch_size=self.train_batch_size)
+        params = {
+            'prog_bar': True,
+            'logger': True,
+            'batch_size': self.train_batch_size,
+            'sync_dist': True
+        }
+        self.log('training_loss', loss_mean, **params)
 
         self.training_step_outputs.clear()
 
@@ -149,12 +161,10 @@ class Mask_RCNN(pl.LightningModule):
         loss_value = losses_reduced.item()
 
         params = {
-            "on_step": True,
             "logger": True,
             "batch_size": len(train_batch),
             "prog_bar": True,
         }
-
         self.log('training_step_loss', loss_value, **params)
         self.log_dict(loss_dict_reduced, **params)
 
@@ -190,12 +200,16 @@ class Mask_RCNN(pl.LightningModule):
         images, targets = val_batch
 
         model_time = time.time()
-
         outputs = self.model(images)
         outputs = [{k: v.to(self.cpu_device) for k, v in t.items()} for t in outputs]
-
         model_time = time.time() - model_time
-        self.log('model_time', model_time, on_step=True, batch_size=len(val_batch), sync_dist=True, prog_bar=True)
+
+        model_params = {
+            'batch_size': len(val_batch),
+            'prog_bar': True,
+            # 'sync_dist': True,
+        }
+        self.log('model_time', model_time, **model_params)
 
         res = {target["image_id"].item(): output for target, output in zip(targets, outputs)}
 
@@ -203,8 +217,14 @@ class Mask_RCNN(pl.LightningModule):
             evaluator_time = time.time()
             self.coco_evaluator.update(res)
             evaluator_time = time.time() - evaluator_time
-            self.log('evaluator_time', evaluator_time, on_step=True, batch_size=len(val_batch), sync_dist=True, prog_bar=True)
-        
+
+            evaluate_params = {
+                'batch_size': len(val_batch),
+                'prog_bar': True,
+                # 'sync_dist': True,
+            }
+            self.log('evaluator_time', evaluator_time, **evaluate_params)
+
         return outputs
 
 
@@ -225,9 +245,14 @@ class Mask_RCNN(pl.LightningModule):
 
             self.print(table)
 
-            self.log('map', map, prog_bar=True, logger=True, sync_dist=True)
-            self.log('map_50', map_50, prog_bar=True, logger=True, sync_dist=True)
-            self.log('mar', mar, prog_bar=True, logger=True, sync_dist=True)
+            params = {
+                'prog_bar': True,
+                'logger': True,
+                # 'sync_dist': True,
+            }
+            self.log(f"map_{iou_type}", map, **params)
+            self.log(f'map_50_{iou_type}', map_50, **params)
+            self.log(f'mar_{iou_type}', mar, **params)
 
             # skip since too many for logging
             # per_class_AP_dict = summary["per_class_AP_dict"]
