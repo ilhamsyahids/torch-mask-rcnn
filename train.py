@@ -11,7 +11,7 @@ import utils
 import dataset
 import models
 
-from loggers import LogPredictionsCallback, COCOEvaluator
+from callbacks import LogPredictionsCallback, COCOEvaluator
 from config import cfg
 
 def get_args_parser(add_help=True):
