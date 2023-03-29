@@ -1,11 +1,10 @@
 import datetime
+import os
 import time
 import pytorch_lightning as pl
-from pprint import pprint
 
 import torch
 import torch.utils.data
-import torchvision.models
 from torchvision.models.detection import MaskRCNN
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
@@ -13,12 +12,9 @@ from torchvision.models.detection import MaskRCNN
 from torchvision.models.detection import maskrcnn_resnet50_fpn, maskrcnn_resnet50_fpn_v2
 from torchvision.models.detection import MaskRCNN_ResNet50_FPN_Weights, MaskRCNN_ResNet50_FPN_V2_Weights
 from torchvision.models.resnet import ResNet50_Weights
-from torchmetrics.detection.mean_ap import MeanAveragePrecision
 
 import optimizers
 
-from dataset.coco import get_coco_api_from_dataset
-from dataset.coco_eval import CocoEvaluator
 from utils.dist import reduce_dict
 
 
@@ -172,31 +168,11 @@ class Mask_RCNN(pl.LightningModule):
 
         return losses
 
-
-    def _get_iou_types(self, model):
-        model_without_ddp = model
-        if isinstance(model, torch.nn.parallel.DistributedDataParallel):
-            model_without_ddp = model.module
-        iou_types = ["bbox"]
-        if isinstance(model_without_ddp, torchvision.models.detection.MaskRCNN):
-            iou_types.append("segm")
-        if isinstance(model_without_ddp, torchvision.models.detection.KeypointRCNN):
-            iou_types.append("keypoints")
-        return iou_types
-
-
-    def set_coco_api_from_dataset(self, val_dataloader: torch.utils.data.DataLoader):
-        self.coco = get_coco_api_from_dataset(val_dataloader.dataset)
-        self.iou_types = self._get_iou_types(self.model)
-        self.coco_evaluator = CocoEvaluator(self.coco, self.iou_types)
+    def on_validation_epoch_start(self) -> None:
         self.cpu_device = torch.device("cpu")
 
 
-    def on_validation_epoch_start(self) -> None:
-        self.coco_evaluator = CocoEvaluator(self.coco, self.iou_types)
-
-
-    def validation_step(self, val_batch, batch_idx) -> float:
+    def validation_step(self, val_batch, batch_idx):
         images, targets = val_batch
 
         model_time = time.time()
@@ -211,55 +187,12 @@ class Mask_RCNN(pl.LightningModule):
         }
         self.log('model_time', model_time, **model_params)
 
-        res = {target["image_id"].item(): output for target, output in zip(targets, outputs)}
+        evaluate = {target["image_id"].item(): output for target, output in zip(targets, outputs)}
 
-        if self.coco_evaluator is not None:
-            evaluator_time = time.time()
-            self.coco_evaluator.update(res)
-            evaluator_time = time.time() - evaluator_time
-
-            evaluate_params = {
-                'batch_size': len(val_batch),
-                'prog_bar': True,
-                # 'sync_dist': True,
-            }
-            self.log('evaluator_time', evaluator_time, **evaluate_params)
-
-        return outputs
-
-
-    def on_validation_epoch_end(self) -> None:
-        if self.coco_evaluator is None:
-            return
-        
-        self.coco_evaluator.synchronize_between_processes()
-        self.coco_evaluator.accumulate()
-        summaries = self.coco_evaluator.summarize()
-
-        for iou_type in self.iou_types:
-            summary = summaries[iou_type]
-            map = summary["map"]
-            map_50 = summary["map_50"]
-            mar = summary["mar"]
-            table = summary["table"]
-
-            self.print(table)
-
-            params = {
-                'prog_bar': True,
-                'logger': True,
-                # 'sync_dist': True,
-            }
-            self.log(f"map_{iou_type}", map, **params)
-            self.log(f'map_50_{iou_type}', map_50, **params)
-            self.log(f'mar_{iou_type}', mar, **params)
-
-            # skip since too many for logging
-            # per_class_AP_dict = summary["per_class_AP_dict"]
-            # per_class_AR_dict = summary["per_class_AR_dict"]
-            # self.log_dict(per_class_AP_dict)
-            # self.log_dict(per_class_AR_dict)
-
+        return {
+            'outputs': outputs,
+            'evaluate': evaluate
+        }
 
     def configure_optimizers(self):
         optimizer_params = {

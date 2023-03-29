@@ -16,15 +16,16 @@ def get_transform(train, cfg):
         return presets.DetectionPresetEval()
 
 
-def get_datasets(name, cfg):
+def get_datasets(name, cfg, mode='train'):
     if name == 'coco':
-        train = get_coco(cfg.DATA_PATH, 'train', get_transform(train=True, cfg=cfg))
-        val = get_coco(cfg.DATA_PATH, 'val', get_transform(train=False, cfg=cfg))
-        class_names = COCO_CLASS_NAMES
-    else:
-        raise RuntimeError("Only COCO dataset is supported for now.")
-
-    return train, val, class_names
+        if mode == 'train':
+            return get_coco(cfg.DATA_PATH, 'train', get_transform(train=True, cfg=cfg))
+        elif mode == 'val':
+            return get_coco(cfg.DATA_PATH, 'val', get_transform(train=False, cfg=cfg))
+        elif mode == 'class_names':
+            return COCO_CLASS_NAMES
+        raise RuntimeError("Unknown mode: {}".format(mode))
+    raise RuntimeError("Only COCO dataset is supported for now.")
 
 
 def collate_fn(batch):

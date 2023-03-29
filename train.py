@@ -11,7 +11,7 @@ import utils
 import dataset
 import models
 
-from loggers import LogPredictionsCallback
+from loggers import LogPredictionsCallback, COCOEvaluator
 from config import cfg
 
 def get_args_parser(add_help=True):
@@ -55,7 +55,9 @@ def main(cfg):
 
     print("Loading dataset...")
 
-    train_dataset, val_dataset, class_names = dataset.get_datasets(cfg.DATASET.NAME, cfg.DATASET)
+    train_dataset = dataset.get_datasets(cfg.DATASET.NAME, cfg.DATASET, mode='train')
+    val_dataset = dataset.get_datasets(cfg.DATASET.NAME, cfg.DATASET, mode='val')
+    class_names = dataset.get_datasets(cfg.DATASET.NAME, cfg.DATASET, mode='class_names')
 
     train_collate_fn = dataset.collate_fn
     if cfg.USE_SIMPLE_COPY_PASTE:
@@ -119,13 +121,13 @@ def main(cfg):
     }
     pred_callback = LogPredictionsCallback(**pred_params)
 
+    coco_evaluator = COCOEvaluator(val_dataloader=val_dataloader)
 
     print("Building model...")
     module_params = {
         'cfg': cfg,
     }
     model = models.Mask_RCNN(**module_params)
-    model.set_coco_api_from_dataset(val_dataloader)
 
     wandb_logger.watch(model.model, log="all")
 
@@ -134,7 +136,7 @@ def main(cfg):
         # 'enable_progress_bar': False,
         'profiler': "simple",
         "logger": [wandb_logger, csv_logger, tb_logger],
-        'callbacks': [pred_callback, tqdm_callback, checkpoint_callback, lr_monitor_callback],
+        'callbacks': [pred_callback, tqdm_callback, checkpoint_callback, lr_monitor_callback, coco_evaluator],
         'precision': cfg.ACCELERATOR.PRECISION,
         'accelerator': cfg.ACCELERATOR.NAME,
         'devices': cfg.ACCELERATOR.DEVICES,

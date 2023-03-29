@@ -17,6 +17,7 @@ class LogPredictionsCallback(Callback):
 
     def on_validation_batch_end(self, trainer: pl.Trainer, pl_module, outputs, batch, batch_idx):
         if batch_idx == 0:
+            outputs = outputs['outputs']
             n = self.number_of_samples
             img_list, targets = batch
             img_list = img_list[:n]
