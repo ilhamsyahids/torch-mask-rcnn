@@ -8,15 +8,9 @@ from dataset.coco_eval import CocoEvaluator
 
 class COCOEvaluator(pl.Callback):
 
-    def __init__(self, val_dataloader) -> None:
+    def __init__(self, datamodule) -> None:
         super().__init__()
-        self.cpu_device = torch.device("cpu")
-        self.val_dataloader = val_dataloader
-    
-    def setup(self, trainer: "pl.Trainer", pl_module: "pl.LightningModule", stage: str) -> None:
-        self.coco = get_coco_api_from_dataset(self.val_dataloader.dataset)
-        self.iou_types = self._get_iou_types(trainer.model)
-        self.coco_evaluator = CocoEvaluator(self.coco, self.iou_types)
+        self.datamodule = datamodule
 
     def _get_iou_types(self, model):
         model_without_ddp = model
@@ -28,10 +22,14 @@ class COCOEvaluator(pl.Callback):
         if isinstance(model_without_ddp, torchvision.models.detection.KeypointRCNN):
             iou_types.append("keypoints")
         return iou_types
+
+    def on_validation_start(self, trainer: "pl.Trainer", pl_module: "pl.LightningModule") -> None:
+        self.coco = get_coco_api_from_dataset(self.datamodule.v_dataloader.dataset)
+        self.iou_types = self._get_iou_types(trainer.model)
+        self.coco_evaluator = CocoEvaluator(self.coco, self.iou_types)
     
     def on_validation_epoch_start(self, trainer: "pl.Trainer", pl_module: "pl.LightningModule") -> None:
         self.coco_evaluator = CocoEvaluator(self.coco, self.iou_types)
-        self.cpu_device = torch.device("cpu")
 
     def on_validation_batch_end(self, trainer: "pl.Trainer", pl_module: "pl.LightningModule", outputs, batch, batch_idx: int) -> None:
         if self.coco_evaluator is not None:

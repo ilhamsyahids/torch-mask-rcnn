@@ -53,45 +53,9 @@ def main(cfg):
     }
     tb_logger = TensorBoardLogger(**tb_logger_params)
 
-    print("Loading dataset...")
+    print("Building DataModule...")
 
-    train_dataset = dataset.get_datasets(cfg.DATASET.NAME, cfg.DATASET, mode='train')
-    val_dataset = dataset.get_datasets(cfg.DATASET.NAME, cfg.DATASET, mode='val')
-    class_names = dataset.get_datasets(cfg.DATASET.NAME, cfg.DATASET, mode='class_names')
-
-    train_collate_fn = dataset.collate_fn
-    if cfg.USE_SIMPLE_COPY_PASTE:
-        if args.data_augmentation != "lsj":
-            raise RuntimeError("SimpleCopyPaste algorithm currently only supports the 'lsj' data augmentation policies")
-
-        train_collate_fn = dataset.copypaste_collate_fn
-
-    train_dataloader_params = {
-        'dataset': train_dataset,
-        'collate_fn': train_collate_fn,
-        'num_workers': cfg.DATALOADER.WORKERS,
-        'batch_size': cfg.DATALOADER.TRAIN_BATCH_SIZE,
-    }
-
-    val_dataloader_params = {
-        'dataset': val_dataset,
-        'collate_fn': dataset.collate_fn,
-        'num_workers': cfg.DATALOADER.WORKERS,
-        'batch_size': cfg.DATALOADER.VAL_BATCH_SIZE,
-    }
-
-    # required for TPU support
-    if cfg.ACCELERATOR.NAME == 'tpu':
-        import torch_xla.core.xla_model as xm
-
-        train_sampler = torch.utils.data.distributed.DistributedSampler(
-            train_dataset, num_replicas=xm.xrt_world_size(), rank=xm.get_ordinal(), shuffle=True
-        )
-
-        train_dataloader_params['sampler'] = train_sampler
-
-    train_dataloader = torch.utils.data.DataLoader(**train_dataloader_params)
-    val_dataloader = torch.utils.data.DataLoader(**val_dataloader_params)
+    datamodule = dataset.COCODataModule(cfg)
 
     print("Building callback...")
     checkpoint_params = {
@@ -117,11 +81,11 @@ def main(cfg):
 
     pred_params = {
         'wandb_logger': wandb_logger,
-        'class_names': class_names,
+        'class_names': datamodule.class_names,
     }
     pred_callback = LogPredictionsCallback(**pred_params)
 
-    coco_evaluator = COCOEvaluator(val_dataloader=val_dataloader)
+    coco_evaluator = COCOEvaluator(datamodule=datamodule)
 
     print("Building model...")
     module_params = {
@@ -146,8 +110,7 @@ def main(cfg):
     }
     fit_params = {
         'model': model,
-        'train_dataloaders': train_dataloader,
-        'val_dataloaders': val_dataloader,
+        'datamodule': datamodule,
     }
     if cfg.MODEL.USE_SYNC_BATCH_NORM:
         training_params['sync_batchnorm'] = True

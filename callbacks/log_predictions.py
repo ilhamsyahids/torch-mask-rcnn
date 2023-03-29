@@ -16,6 +16,9 @@ class LogPredictionsCallback(Callback):
         self.number_of_samples = 5
 
     def on_validation_batch_end(self, trainer: pl.Trainer, pl_module, outputs, batch, batch_idx):
+        if not trainer.is_global_zero:
+            return
+
         if batch_idx == 0:
             outputs = outputs['outputs']
             n = self.number_of_samples
