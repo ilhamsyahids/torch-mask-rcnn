@@ -5,7 +5,7 @@ import torch.utils.data.distributed
 
 from pytorch_lightning import Trainer
 from pytorch_lightning.loggers import WandbLogger, CSVLogger, TensorBoardLogger
-from pytorch_lightning.callbacks import ModelCheckpoint, TQDMProgressBar
+from pytorch_lightning.callbacks import ModelCheckpoint, TQDMProgressBar, LearningRateMonitor
 
 import utils
 import dataset
@@ -33,7 +33,7 @@ def main(cfg):
         'name': cfg.CONFIG_NAME,
         'project': cfg.PROJECT_NAME,
         'save_dir': cfg.LOGGER.OUTPUT_DIR,
-        'log_model': True # log model at the end of training
+        # 'log_model': True # log model at the end of training
         # 'offline': True
     }
     wandb_logger = WandbLogger(**wandb_logger_params)
@@ -93,11 +93,12 @@ def main(cfg):
 
     print("Building callback...")
     checkpoint_params = {
-        'monitor': 'map_bbox',
-        'every_n_epochs': 1,
-        'mode': 'max',
+        # 'monitor': 'map_bbox',
+        # 'every_n_epochs': 1,
+        # 'mode': 'max',
+        'save_top_k': 0, # no save checkpoint
         # 'save_top_k': -1, # save all
-        'dirpath': cfg.OUTPUT_DIR + '/' + cfg.CONFIG_NAME,
+        # 'dirpath': cfg.OUTPUT_DIR + '/' + cfg.CONFIG_NAME,
     }
     checkpoint_callback = ModelCheckpoint(**checkpoint_params)
 
@@ -105,6 +106,12 @@ def main(cfg):
         'refresh_rate': cfg.PRINT_FREQ,
     }
     tqdm_callback = TQDMProgressBar(**tqdm_params)
+
+    lr_monitor_params = {
+        'logging_interval': 'step',
+        'log_momentum': True,
+    }
+    lr_monitor_callback = LearningRateMonitor(**lr_monitor_params)
 
     pred_params = {
         'wandb_logger': wandb_logger,
@@ -127,7 +134,7 @@ def main(cfg):
         # 'enable_progress_bar': False,
         'profiler': "simple",
         "logger": [wandb_logger, csv_logger, tb_logger],
-        'callbacks': [pred_callback, tqdm_callback, checkpoint_callback],
+        'callbacks': [pred_callback, tqdm_callback, checkpoint_callback, lr_monitor_callback],
         'precision': cfg.ACCELERATOR.PRECISION,
         'accelerator': cfg.ACCELERATOR.NAME,
         'devices': cfg.ACCELERATOR.DEVICES,
