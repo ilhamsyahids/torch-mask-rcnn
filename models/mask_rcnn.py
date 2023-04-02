@@ -14,6 +14,7 @@ from torchvision.models.detection import MaskRCNN_ResNet50_FPN_Weights, MaskRCNN
 from torchvision.models.resnet import ResNet50_Weights
 
 import optimizers
+import schedulers
 
 from utils.dist import reduce_dict
 
@@ -204,4 +205,12 @@ class Mask_RCNN(pl.LightningModule):
             'momentum': self.cfg.OPTIMIZER.MOMENTUM,
         }
         optimizer = optimizers.get_optimizer(**optimizer_params)
-        return optimizer
+
+        scheduler_params = {
+            'name': self.cfg.SCHEDULER.NAME,
+            'optimizer': optimizer,
+            'cfg': self.cfg,
+        }
+        scheduler = schedulers.get_scheduler(**scheduler_params)
+
+        return [optimizer], [scheduler]

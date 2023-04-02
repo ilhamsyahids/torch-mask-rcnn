@@ -2,6 +2,8 @@ import torch
 import torch.optim
 
 def get_optimizer(opt: str, parameters, lr: float, weight_decay: float, **kwargs):
+    parameters = [p for p in parameters if p.requires_grad]
+
     opt_name = opt.lower()
     if opt_name.startswith("sgd"):
         optimizer = torch.optim.SGD(

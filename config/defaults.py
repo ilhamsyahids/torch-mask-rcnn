@@ -81,6 +81,25 @@ _C.OPTIMIZER.NESTEROV = False
 
 
 # -----------------------------------------------------------------------------
+# Scheduler
+# -----------------------------------------------------------------------------
+
+_C.SCHEDULER = CN()
+_C.SCHEDULER.NAME = "multisteplr"
+
+_C.SCHEDULER.MAX_ITER = 40000
+_C.SCHEDULER.BASE_LR = 0.001
+
+_C.SCHEDULER.GAMMA = 0.1
+_C.SCHEDULER.ALPHA = 0.001
+_C.SCHEDULER.STEPS = (30000,)
+
+_C.SCHEDULER.WARMUP_FACTOR = 1.0 / 3
+_C.SCHEDULER.WARMUP_ITERS = 500
+_C.SCHEDULER.WARMUP_METHOD = "linear"
+
+
+# -----------------------------------------------------------------------------
 # Logger
 # -----------------------------------------------------------------------------
 
