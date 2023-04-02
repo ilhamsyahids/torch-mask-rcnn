@@ -58,6 +58,8 @@ def main(cfg):
     datamodule = dataset.COCODataModule(cfg)
 
     print("Building callback...")
+    callbacks = []
+
     checkpoint_params = {
         # 'monitor': 'map_bbox',
         # 'every_n_epochs': 1,
@@ -67,25 +69,30 @@ def main(cfg):
         # 'dirpath': cfg.OUTPUT_DIR + '/' + cfg.CONFIG_NAME,
     }
     checkpoint_callback = ModelCheckpoint(**checkpoint_params)
+    callbacks.append(checkpoint_callback)
 
     tqdm_params = {
         'refresh_rate': cfg.PRINT_FREQ,
     }
     tqdm_callback = TQDMProgressBar(**tqdm_params)
+    callbacks.append(tqdm_callback)
 
     lr_monitor_params = {
         'logging_interval': 'step',
         'log_momentum': True,
     }
     lr_monitor_callback = LearningRateMonitor(**lr_monitor_params)
+    callbacks.append(lr_monitor_callback)
 
-    pred_params = {
-        'wandb_logger': wandb_logger,
-        'class_names': datamodule.class_names,
-    }
-    pred_callback = LogPredictionsCallback(**pred_params)
+    # pred_params = {
+    #     'wandb_logger': wandb_logger,
+    #     'class_names': datamodule.class_names,
+    # }
+    # pred_callback = LogPredictionsCallback(**pred_params)
+    # callbacks.append(pred_callback)
 
     coco_evaluator = COCOEvaluator(datamodule=datamodule)
+    callbacks.append(coco_evaluator)
 
     print("Building model...")
     module_params = {
@@ -100,7 +107,7 @@ def main(cfg):
         # 'enable_progress_bar': False,
         'profiler': "simple",
         "logger": [wandb_logger, csv_logger, tb_logger],
-        'callbacks': [pred_callback, tqdm_callback, checkpoint_callback, lr_monitor_callback, coco_evaluator],
+        'callbacks': callbacks,
         'precision': cfg.ACCELERATOR.PRECISION,
         'accelerator': cfg.ACCELERATOR.NAME,
         'devices': cfg.ACCELERATOR.DEVICES,
