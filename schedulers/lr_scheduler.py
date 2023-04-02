@@ -93,9 +93,7 @@ class WarmupCosineLR(torch.optim.lr_scheduler._LRScheduler):
         ]
 
 
-def _get_warmup_factor_at_iter(
-    method: str, iter: int, warmup_iters: int, warmup_factor: float
-) -> tuple(float, float):
+def _get_warmup_factor_at_iter(method: str, iter: int, warmup_iters: int, warmup_factor: float):
     """
     Return the learning rate warmup factor at a specific iteration.
     See :paper:`ImageNet in 1h` for more details.
