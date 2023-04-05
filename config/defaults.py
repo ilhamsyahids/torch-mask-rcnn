@@ -27,6 +27,9 @@ _C.PRINT_FREQ = 20
 
 _C.STRATEGY = "auto"
 
+_C.RESUMED = False
+_C.CHECKPOINT_PATH = ''
+
 # -----------------------------------------------------------------------------
 # Accelerator
 # -----------------------------------------------------------------------------
@@ -42,7 +45,7 @@ _C.ACCELERATOR.PRECISION = "16"
 
 _C.DATASET = CN()
 _C.DATASET.NAME = "coco"
-_C.DATASET.DATA_PATH = "data/coco"
+_C.DATASET.DATA_PATH = "../data/coco"
 _C.DATASET.DATA_AUGMENTATION = "hflip"
 _C.DATASET.WEIGHTS = None
 _C.DATASET.NUM_CLASSES = 91
@@ -87,15 +90,15 @@ _C.OPTIMIZER.NESTEROV = False
 _C.SCHEDULER = CN()
 _C.SCHEDULER.NAME = "multisteplr"
 
-_C.SCHEDULER.MAX_ITER = 40000
+_C.SCHEDULER.MAX_ITER = 4000
 _C.SCHEDULER.BASE_LR = 0.001
 
 _C.SCHEDULER.GAMMA = 0.1
 _C.SCHEDULER.ALPHA = 0.001
-_C.SCHEDULER.STEPS = (30000,)
+_C.SCHEDULER.STEPS = (3000,)
 
 _C.SCHEDULER.WARMUP_FACTOR = 1.0 / 3
-_C.SCHEDULER.WARMUP_ITERS = 500
+_C.SCHEDULER.WARMUP_ITERS = 1
 _C.SCHEDULER.WARMUP_METHOD = "linear"
 
 
