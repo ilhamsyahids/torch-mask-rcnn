@@ -33,7 +33,7 @@ def main(cfg):
         'name': cfg.CONFIG_NAME,
         'project': cfg.PROJECT_NAME,
         'save_dir': cfg.LOGGER.OUTPUT_DIR,
-        # 'log_model': True # log model at the end of training
+        'log_model': True # log model at the end of training
         # 'offline': True
     }
     wandb_logger = WandbLogger(**wandb_logger_params)
@@ -60,16 +60,16 @@ def main(cfg):
     print("Building callback...")
     callbacks = []
 
-    checkpoint_params = {
-        # 'monitor': 'map_bbox',
-        # 'every_n_epochs': 1,
-        # 'mode': 'max',
-        'save_top_k': 0, # no save checkpoint
-        # 'save_top_k': -1, # save all
-        # 'dirpath': cfg.OUTPUT_DIR + '/' + cfg.CONFIG_NAME,
-    }
-    checkpoint_callback = ModelCheckpoint(**checkpoint_params)
-    callbacks.append(checkpoint_callback)
+    # checkpoint_params = {
+    #     # 'monitor': 'map_bbox',
+    #     # 'every_n_epochs': 1,
+    #     # 'mode': 'max',
+    #     'save_top_k': 0, # no save checkpoint
+    #     # 'save_top_k': -1, # save all
+    #     # 'dirpath': cfg.OUTPUT_DIR + '/' + cfg.CONFIG_NAME,
+    # }
+    # checkpoint_callback = ModelCheckpoint(**checkpoint_params)
+    # callbacks.append(checkpoint_callback)
 
     tqdm_params = {
         'refresh_rate': cfg.PRINT_FREQ,
@@ -123,6 +123,9 @@ def main(cfg):
         training_params['sync_batchnorm'] = True
     if cfg.MODEL.DETERMINISTIC:
         training_params['deterministic'] = True
+
+    if cfg.RESUMED:
+        fit_params['ckpt_path'] = cfg.CHECKPOINT_PATH
 
     trainer = Trainer(**training_params)
     trainer.fit(**fit_params)
