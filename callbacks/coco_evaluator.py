@@ -5,6 +5,7 @@ import torchvision.models.detection
 
 from dataset.coco import get_coco_api_from_dataset
 from dataset.coco_eval import CocoEvaluator
+from models.mask_rcnn import Mask_RCNN
 
 class COCOEvaluator(pl.Callback):
 
@@ -23,9 +24,9 @@ class COCOEvaluator(pl.Callback):
             iou_types.append("keypoints")
         return iou_types
 
-    def on_validation_start(self, trainer: "pl.Trainer", pl_module: "pl.LightningModule") -> None:
+    def on_validation_start(self, trainer: "pl.Trainer", pl_module: "Mask_RCNN") -> None:
         self.coco = get_coco_api_from_dataset(self.datamodule.v_dataloader.dataset)
-        self.iou_types = self._get_iou_types(trainer.model)
+        self.iou_types = self._get_iou_types(pl_module.model)
         self.coco_evaluator = CocoEvaluator(self.coco, self.iou_types)
     
     def on_validation_epoch_start(self, trainer: "pl.Trainer", pl_module: "pl.LightningModule") -> None:
