@@ -49,6 +49,7 @@ _C.DATASET.DATA_PATH = "../data/coco"
 _C.DATASET.DATA_AUGMENTATION = "hflip"
 _C.DATASET.WEIGHTS = None
 _C.DATASET.NUM_CLASSES = 91
+_C.DATASET.ASPECT_RATIO_GROUP_FACTOR = 3
 
 # -----------------------------------------------------------------------------
 # Dataloader

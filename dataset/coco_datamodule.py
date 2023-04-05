@@ -2,8 +2,10 @@ import os
 import pytorch_lightning as pl
 import torch
 import torch.utils.data.dataloader
+import torch.utils.data.distributed
 
 from .utils import get_datasets, collate_fn, copypaste_collate_fn
+from .group_by_aspect_ratio import create_aspect_ratio_groups, GroupedBatchSampler
 
 class COCODataModule(pl.LightningDataModule):
     def __init__(self, cfg) -> None:
@@ -57,6 +59,8 @@ class COCODataModule(pl.LightningDataModule):
             'batch_size': self.cfg.DATALOADER.TRAIN_BATCH_SIZE,
         }
 
+        train_sampler = torch.utils.data.distributed.DistributedSampler(self.train_dataset)
+
         # required for TPU support
         if self.cfg.ACCELERATOR.NAME == 'tpu':
             import torch_xla.core.xla_model as xm
@@ -66,6 +70,14 @@ class COCODataModule(pl.LightningDataModule):
             )
 
             train_dataloader_params['sampler'] = train_sampler
+
+        if self.cfg.DATASET.ASPECT_RATIO_GROUP_FACTOR >= 0:
+            group_ids = create_aspect_ratio_groups(self.train_dataset, k=self.cfg.DATASET.ASPECT_RATIO_GROUP_FACTOR)
+            train_batch_sampler = GroupedBatchSampler(train_sampler, group_ids, self.cfg.DATALOADER.TRAIN_BATCH_SIZE)
+        else:
+            train_batch_sampler = torch.utils.data.BatchSampler(train_sampler, self.cfg.DATALOADER.TRAIN_BATCH_SIZE, drop_last=True)
+        
+        train_dataloader_params['batch_sampler'] = train_batch_sampler
 
         self.t_dataloader = torch.utils.data.DataLoader(**train_dataloader_params)
 
