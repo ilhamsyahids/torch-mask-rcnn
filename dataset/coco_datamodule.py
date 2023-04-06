@@ -56,7 +56,6 @@ class COCODataModule(pl.LightningDataModule):
             'dataset': self.train_dataset,
             'collate_fn': train_collate_fn,
             'num_workers': num_workers,
-            # 'batch_size': self.cfg.DATALOADER.TRAIN_BATCH_SIZE,
         }
 
         train_sampler = torch.utils.data.distributed.DistributedSampler(self.train_dataset)
@@ -75,7 +74,7 @@ class COCODataModule(pl.LightningDataModule):
             group_ids = create_aspect_ratio_groups(self.train_dataset, k=self.cfg.DATASET.ASPECT_RATIO_GROUP_FACTOR)
             train_batch_sampler = GroupedBatchSampler(train_sampler, group_ids, self.cfg.DATALOADER.TRAIN_BATCH_SIZE)
         else:
-            train_batch_sampler = torch.utils.data.BatchSampler(train_sampler, self.cfg.DATALOADER.TRAIN_BATCH_SIZE, drop_last=True)
+            train_dataloader_params['batch_size'] = self.cfg.DATALOADER.TRAIN_BATCH_SIZE
         
         train_dataloader_params['batch_sampler'] = train_batch_sampler
 
