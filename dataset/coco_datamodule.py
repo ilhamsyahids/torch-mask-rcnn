@@ -29,7 +29,7 @@ class COCODataModule(pl.LightningDataModule):
     def val_dataloader(self):
         print("Building validation dataloader...")
 
-        num_workers = self.cfg.DATALOADER.WORKERS
+        num_workers = os.cpu_count() # self.cfg.DATALOADER.WORKERS
 
         val_dataloader_params = {
             'dataset': self.val_dataset,
@@ -56,7 +56,7 @@ class COCODataModule(pl.LightningDataModule):
             'dataset': self.train_dataset,
             'collate_fn': train_collate_fn,
             'num_workers': num_workers,
-            'batch_size': self.cfg.DATALOADER.TRAIN_BATCH_SIZE,
+            # 'batch_size': self.cfg.DATALOADER.TRAIN_BATCH_SIZE,
         }
 
         train_sampler = torch.utils.data.distributed.DistributedSampler(self.train_dataset)
