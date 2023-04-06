@@ -1,5 +1,5 @@
 import datetime
-import os
+import math
 import time
 import pytorch_lightning as pl
 
@@ -164,6 +164,13 @@ class Mask_RCNN(pl.LightningModule):
         }
         self.log('training_step_loss', loss_value, **params)
         self.log_dict(loss_dict_reduced, **params)
+
+        # stop when divergence
+        if not math.isfinite(loss_value):
+            self.print()
+            self.print(f"Loss is {loss_value}, stopping training")
+            self.trainer.should_stop = True
+            self.trainer.limit_val_batches = 0
 
         self.training_step_outputs.append(losses)
 
