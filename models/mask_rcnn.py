@@ -213,6 +213,10 @@ class Mask_RCNN(pl.LightningModule):
         }
         optimizer = optimizers.get_optimizer(**optimizer_params)
 
+        # not using scheduler
+        if self.cfg.SCHEDULER.NAME == "":
+            return optimizer
+
         scheduler_params = {
             'name': self.cfg.SCHEDULER.NAME,
             'optimizer': optimizer,
