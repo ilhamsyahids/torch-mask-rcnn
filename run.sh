@@ -1,4 +1,9 @@
 
+if [ $# -lt 1 ]; then
+    echo "Usage: $0 <config-folder>"
+    exit 1
+fi
+
 # get all yaml file in config folder
 config_files=$(ls $@/*.yaml)
 
