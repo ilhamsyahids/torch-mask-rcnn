@@ -1,0 +1,7 @@
+
+if [ $# -lt 1 ]; then
+    echo "Usage: $0 <config-file>"
+    exit 1
+fi
+
+python3 train.py --config-file $@ > $@.log 2> $@.err < /dev/null
