@@ -1,6 +1,6 @@
 PROJECT_NAME: "MaskRCNN"
 
-CONFIG_NAME: "sgd-16-aspect-ratio"
+CONFIG_NAME: "sgd-16-aspect-ratio-epoch-10"
 
 EPOCHS: 10
 
