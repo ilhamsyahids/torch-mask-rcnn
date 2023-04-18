@@ -49,7 +49,7 @@ _C.DATASET.DATA_PATH = "../data/coco"
 _C.DATASET.DATA_AUGMENTATION = "hflip"
 _C.DATASET.WEIGHTS = None
 _C.DATASET.NUM_CLASSES = 91
-_C.DATASET.ASPECT_RATIO_GROUP_FACTOR = 3
+_C.DATASET.ASPECT_RATIO_GROUP_FACTOR = -1
 
 # -----------------------------------------------------------------------------
 # Dataloader
@@ -110,12 +110,5 @@ _C.SCHEDULER.WARMUP_METHOD = "linear"
 _C.LOGGER = CN()
 _C.LOGGER.OUTPUT_DIR = "logs"
 _C.LOGGER.VERSION = 1
-
-
-# -----------------------------------------------------------------------------
-# Metrics
-# -----------------------------------------------------------------------------
-
-_C.METRICS = CN()
 
 cfg = _C
