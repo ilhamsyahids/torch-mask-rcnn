@@ -1,0 +1,11 @@
+PROJECT_NAME: "MaskRCNN"
+
+CONFIG_NAME: "sgd-16-precision-32-epoch-20"
+
+EPOCHS: 20
+
+SCHEDULER:
+  NAME: ""
+
+ACCELERATOR:
+  PRECISION: "32-true"

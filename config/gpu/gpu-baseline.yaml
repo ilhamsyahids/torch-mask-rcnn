@@ -1,8 +1,8 @@
 PROJECT_NAME: "MaskRCNN"
 
-CONFIG_NAME: "sgd-16"
+CONFIG_NAME: "sgd-16-epoch-20"
 
-EPOCHS: 10
+EPOCHS: 20
 
 SCHEDULER:
   NAME: ""
