@@ -1,0 +1,19 @@
+PROJECT_NAME: "MaskRCNN"
+
+CONFIG_NAME: "sgd-16-aspect-ratio-epoch-10"
+
+EPOCHS: 20
+
+LOGGER:
+  ID: "1kahofzh"
+  VERSION: 3
+
+RESUMED: True
+
+CHECKPOINT_PATH: 'logs/MaskRCNN/1kahofzh/checkpoints/epoch=11-step=10992.ckpt'
+
+SCHEDULER:
+  NAME: ""
+
+DATASET:
+  ASPECT_RATIO_GROUP_FACTOR: 3
