@@ -1,0 +1,8 @@
+PROJECT_NAME: "MaskRCNN"
+
+CONFIG_NAME: "sgd-20"
+
+EPOCHS: 10
+
+SCHEDULER:
+  NAME: ""

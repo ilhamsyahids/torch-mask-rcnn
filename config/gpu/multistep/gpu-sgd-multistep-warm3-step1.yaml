@@ -1,4 +1,4 @@
-PROJECT_NAME: "MaskRCCN"
+PROJECT_NAME: "MaskRCNN"
 
 CONFIG_NAME: "sgd-16-multistep-warm3-step1"
 
