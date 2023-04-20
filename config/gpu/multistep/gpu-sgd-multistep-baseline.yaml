@@ -1,0 +1,9 @@
+PROJECT_NAME: "MaskRCCN"
+
+CONFIG_NAME: "sgd-16-multistep-baseline"
+
+EPOCHS: 10
+
+SCHEDULER:
+  STEPS: (5,8)
+  WARMUP_ITERS: 1

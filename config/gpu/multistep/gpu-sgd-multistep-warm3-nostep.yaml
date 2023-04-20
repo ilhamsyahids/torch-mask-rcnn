@@ -1,0 +1,8 @@
+PROJECT_NAME: "MaskRCCN"
+
+CONFIG_NAME: "sgd-16-multistep-warm3-nostep"
+
+EPOCHS: 10
+
+SCHEDULER:
+  WARMUP_ITERS: 3
