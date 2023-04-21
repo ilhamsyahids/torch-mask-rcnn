@@ -1,13 +1,13 @@
 PROJECT_NAME: "MaskRCNN"
 
-CONFIG_NAME: "sgd-16-multistep-baseline"
+CONFIG_NAME: "sgd-16-multistep-gamma2-baseline"
 
 EPOCHS: 10
 
 SCHEDULER:
   STEPS: (5,8)
   WARMUP_ITERS: 1
-  GAMMA: 2
+  GAMMA: 2.0
 
 DATASET:
   ASPECT_RATIO_GROUP_FACTOR: 2
