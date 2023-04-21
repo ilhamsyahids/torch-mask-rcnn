@@ -1,0 +1,282 @@
+wandb: Currently logged in as: ilhamsyahids. Use `wandb login --relogin` to force relogin
+wandb: wandb version 0.15.0 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.14.0
+wandb: Run data is saved locally in /raid/data/m23522033/logs/wandb/run-20230421_060457-9zvfhxqb
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run sgd-16-multistep-baseline
+wandb: ⭐️ View project at https://wandb.ai/ilhamsyahids/MaskRCNN
+wandb: 🚀 View run at https://wandb.ai/ilhamsyahids/MaskRCNN/runs/9zvfhxqb
+wandb: logging graph, to disable use `wandb.watch(log_graph=False)`
+/home/m23522033/torch-mask-rcnn/.venv/lib/python3.8/site-packages/lightning_fabric/connector.py:562: UserWarning: 16 is supported for historical reasons but its usage is discouraged. Please set your precision to 16-mixed instead!
+  rank_zero_warn(
+/home/m23522033/torch-mask-rcnn/.venv/lib/python3.8/site-packages/lightning_fabric/plugins/environments/slurm.py:165: PossibleUserWarning: The `srun` command is available on your system but is not used. HINT: If your intention is to run Lightning on SLURM, prepend your python command with `srun` like so: srun python3 train.py --config-file config/gpu/multistep/gpu-sgd ...
+  rank_zero_warn(
+Using 16bit Automatic Mixed Precision (AMP)
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+/home/m23522033/torch-mask-rcnn/.venv/lib/python3.8/site-packages/lightning_fabric/plugins/environments/slurm.py:165: PossibleUserWarning: The `srun` command is available on your system but is not used. HINT: If your intention is to run Lightning on SLURM, prepend your python command with `srun` like so: srun python3 train.py --config-file config/gpu/multistep/gpu-sgd ...
+  rank_zero_warn(
+Initializing distributed: GLOBAL_RANK: 0, MEMBER: 1/8
+Initializing distributed: GLOBAL_RANK: 2, MEMBER: 3/8
+Initializing distributed: GLOBAL_RANK: 4, MEMBER: 5/8
+Initializing distributed: GLOBAL_RANK: 7, MEMBER: 8/8
+Initializing distributed: GLOBAL_RANK: 6, MEMBER: 7/8
+Initializing distributed: GLOBAL_RANK: 3, MEMBER: 4/8
+Initializing distributed: GLOBAL_RANK: 5, MEMBER: 6/8
+Initializing distributed: GLOBAL_RANK: 1, MEMBER: 2/8
+----------------------------------------------------------------------------------------------------
+distributed_backend=nccl
+All distributed processes registered. Starting with 8 processes
+----------------------------------------------------------------------------------------------------
+
+LOCAL_RANK: 4 - CUDA_VISIBLE_DEVICES: [0,1,2,3,4,5,6,7]
+LOCAL_RANK: 5 - CUDA_VISIBLE_DEVICES: [0,1,2,3,4,5,6,7]
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1,2,3,4,5,6,7]
+LOCAL_RANK: 3 - CUDA_VISIBLE_DEVICES: [0,1,2,3,4,5,6,7]
+LOCAL_RANK: 1 - CUDA_VISIBLE_DEVICES: [0,1,2,3,4,5,6,7]
+LOCAL_RANK: 2 - CUDA_VISIBLE_DEVICES: [0,1,2,3,4,5,6,7]
+LOCAL_RANK: 6 - CUDA_VISIBLE_DEVICES: [0,1,2,3,4,5,6,7]
+LOCAL_RANK: 7 - CUDA_VISIBLE_DEVICES: [0,1,2,3,4,5,6,7]
+
+  | Name  | Type     | Params
+-----------------------------------
+0 | model | MaskRCNN | 46.4 M
+-----------------------------------
+46.1 M    Trainable params
+225 K     Non-trainable params
+46.4 M    Total params
+185.438   Total estimated model params size (MB)
+/home/m23522033/torch-mask-rcnn/.venv/lib/python3.8/site-packages/pytorch_lightning/trainer/connectors/logger_connector/result.py:432: PossibleUserWarning: It is recommended to use `self.log('model_time', ..., sync_dist=True)` when logging on epoch level in distributed setting to accumulate the metric across devices.
+  warning_cache.warn(
+/home/m23522033/torch-mask-rcnn/.venv/lib/python3.8/site-packages/pytorch_lightning/trainer/connectors/logger_connector/result.py:432: PossibleUserWarning: It is recommended to use `self.log('evaluator_time', ..., sync_dist=True)` when logging on epoch level in distributed setting to accumulate the metric across devices.
+  warning_cache.warn(
+/home/m23522033/torch-mask-rcnn/.venv/lib/python3.8/site-packages/pytorch_lightning/trainer/connectors/logger_connector/result.py:432: PossibleUserWarning: It is recommended to use `self.log('map_bbox', ..., sync_dist=True)` when logging on epoch level in distributed setting to accumulate the metric across devices.
+  warning_cache.warn(
+/home/m23522033/torch-mask-rcnn/.venv/lib/python3.8/site-packages/pytorch_lightning/trainer/connectors/logger_connector/result.py:432: PossibleUserWarning: It is recommended to use `self.log('map_50_bbox', ..., sync_dist=True)` when logging on epoch level in distributed setting to accumulate the metric across devices.
+  warning_cache.warn(
+/home/m23522033/torch-mask-rcnn/.venv/lib/python3.8/site-packages/pytorch_lightning/trainer/connectors/logger_connector/result.py:432: PossibleUserWarning: It is recommended to use `self.log('mar_bbox', ..., sync_dist=True)` when logging on epoch level in distributed setting to accumulate the metric across devices.
+  warning_cache.warn(
+/home/m23522033/torch-mask-rcnn/.venv/lib/python3.8/site-packages/pytorch_lightning/trainer/connectors/logger_connector/result.py:432: PossibleUserWarning: It is recommended to use `self.log('map_segm', ..., sync_dist=True)` when logging on epoch level in distributed setting to accumulate the metric across devices.
+  warning_cache.warn(
+/home/m23522033/torch-mask-rcnn/.venv/lib/python3.8/site-packages/pytorch_lightning/trainer/connectors/logger_connector/result.py:432: PossibleUserWarning: It is recommended to use `self.log('map_50_segm', ..., sync_dist=True)` when logging on epoch level in distributed setting to accumulate the metric across devices.
+  warning_cache.warn(
+/home/m23522033/torch-mask-rcnn/.venv/lib/python3.8/site-packages/pytorch_lightning/trainer/connectors/logger_connector/result.py:432: PossibleUserWarning: It is recommended to use `self.log('mar_segm', ..., sync_dist=True)` when logging on epoch level in distributed setting to accumulate the metric across devices.
+  warning_cache.warn(
+`Trainer.fit` stopped: `max_epochs=10` reached.
+FIT Profiler Report
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|  Action                                                                                                                                                         	|  Mean duration (s)	|  Num calls      	|  Total time (s) 	|  Percentage %   	|
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|  Total                                                                                                                                                          	|  -              	|  454437         	|  1.2278e+04     	|  100 %          	|
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|  run_training_epoch                                                                                                                                             	|  1219.8         	|  10             	|  1.2198e+04     	|  99.344         	|
+|  run_training_batch                                                                                                                                             	|  1.0754         	|  9160           	|  9850.6         	|  80.228         	|
+|  [LightningModule]Mask_RCNN.optimizer_step                                                                                                                      	|  1.0753         	|  9160           	|  9849.7         	|  80.22          	|
+|  [Strategy]DDPStrategy.training_step                                                                                                                            	|  0.53367        	|  9160           	|  4888.4         	|  39.814         	|
+|  [Strategy]DDPStrategy.backward                                                                                                                                 	|  0.1993         	|  9160           	|  1825.6         	|  14.868         	|
+|  [Strategy]DDPStrategy.validation_step                                                                                                                          	|  0.65102        	|  790            	|  514.31         	|  4.1887         	|
+|  [_TrainingEpochLoop].train_dataloader_next                                                                                                                     	|  0.039345       	|  9160           	|  360.4          	|  2.9353         	|
+|  [Strategy]DDPStrategy.batch_to_device                                                                                                                          	|  0.034952       	|  9950           	|  347.77         	|  2.8324         	|
+|  [LightningModule]Mask_RCNN.transfer_batch_to_device                                                                                                            	|  0.034785       	|  9950           	|  346.12         	|  2.8189         	|
+|  [Callback]COCOEvaluator.on_validation_batch_end                                                                                                                	|  0.41074        	|  790            	|  324.48         	|  2.6427         	|
+|  [Callback]COCOEvaluator.on_validation_epoch_end                                                                                                                	|  28.118         	|  10             	|  281.18         	|  2.2901         	|
+|  [Callback]COCOEvaluator.on_validation_start                                                                                                                    	|  3.6655         	|  10             	|  36.655         	|  0.29854        	|
+|  [LightningDataModule]COCODataModule.setup                                                                                                                      	|  20.307         	|  1              	|  20.307         	|  0.16539        	|
+|  [Callback]COCOEvaluator.on_validation_epoch_start                                                                                                              	|  1.9842         	|  10             	|  19.842         	|  0.16161        	|
+|  [Callback]ModelCheckpoint{'monitor': None, 'mode': 'min', 'every_n_train_steps': 0, 'every_n_epochs': 1, 'train_time_interval': None}.on_train_epoch_end       	|  1.7523         	|  10             	|  17.523         	|  0.14272        	|
+|  [_EvaluationLoop].val_next                                                                                                                                     	|  0.01843        	|  790            	|  14.56          	|  0.11858        	|
+|  [LightningModule]Mask_RCNN.on_train_epoch_end                                                                                                                  	|  0.75084        	|  10             	|  7.5084         	|  0.061151       	|
+|  [LightningModule]Mask_RCNN.optimizer_zero_grad                                                                                                                 	|  0.00058718     	|  9160           	|  5.3785         	|  0.043805       	|
+|  [Callback]LearningRateMonitor.on_train_batch_start                                                                                                             	|  0.00021108     	|  9160           	|  1.9335         	|  0.015747       	|
+|  [Callback]TQDMProgressBar.on_train_batch_end                                                                                                                   	|  0.00013023     	|  9160           	|  1.1929         	|  0.0097153      	|
+|  [LightningModule]Mask_RCNN.configure_gradient_clipping                                                                                                         	|  3.1209e-05     	|  9160           	|  0.28587        	|  0.0023283      	|
+|  [Callback]ModelCheckpoint{'monitor': None, 'mode': 'min', 'every_n_train_steps': 0, 'every_n_epochs': 1, 'train_time_interval': None}.on_train_batch_end       	|  2.7557e-05     	|  9160           	|  0.25242        	|  0.0020558      	|
+|  [LightningDataModule]COCODataModule.train_dataloader                                                                                                           	|  0.17026        	|  1              	|  0.17026        	|  0.0013867      	|
+|  [LightningModule]Mask_RCNN.on_validation_model_eval                                                                                                            	|  0.013949       	|  10             	|  0.13949        	|  0.0011361      	|
+|  [Callback]TQDMProgressBar.on_train_batch_start                                                                                                                 	|  6.869e-06      	|  9160           	|  0.06292        	|  0.00051245     	|
+|  [Callback]TQDMProgressBar.on_validation_batch_end                                                                                                              	|  6.8003e-05     	|  790            	|  0.053722       	|  0.00043754     	|
+|  [Callback]TQDMProgressBar.on_after_backward                                                                                                                    	|  5.127e-06      	|  9160           	|  0.046963       	|  0.00038249     	|
+|  [LightningModule]Mask_RCNN.on_before_batch_transfer                                                                                                            	|  4.0638e-06     	|  9950           	|  0.040434       	|  0.00032932     	|
+|  [Callback]TQDMProgressBar.on_validation_start                                                                                                                  	|  0.0039773      	|  10             	|  0.039773       	|  0.00032393     	|
+|  [Callback]TQDMProgressBar.on_before_zero_grad                                                                                                                  	|  4.0433e-06     	|  9160           	|  0.037036       	|  0.00030164     	|
+|  [Callback]TQDMProgressBar.on_before_optimizer_step                                                                                                             	|  3.8388e-06     	|  9160           	|  0.035163       	|  0.00028638     	|
+|  [Callback]TQDMProgressBar.on_before_backward                                                                                                                   	|  3.4955e-06     	|  9160           	|  0.032019       	|  0.00026078     	|
+|  [LightningModule]Mask_RCNN.on_after_batch_transfer                                                                                                             	|  3.1751e-06     	|  9950           	|  0.031592       	|  0.0002573      	|
+|  [LightningModule]Mask_RCNN.on_train_batch_start                                                                                                                	|  2.2505e-06     	|  9160           	|  0.020615       	|  0.0001679      	|
+|  [Callback]LearningRateMonitor.on_train_batch_end                                                                                                               	|  2.1747e-06     	|  9160           	|  0.01992        	|  0.00016224     	|
+|  [LightningModule]Mask_RCNN.on_after_backward                                                                                                                   	|  2.0575e-06     	|  9160           	|  0.018847       	|  0.0001535      	|
+|  [Callback]TQDMProgressBar.on_validation_batch_start                                                                                                            	|  2.3576e-05     	|  790            	|  0.018625       	|  0.00015169     	|
+|  [LightningModule]Mask_RCNN.on_before_zero_grad                                                                                                                 	|  1.9322e-06     	|  9160           	|  0.017699       	|  0.00014415     	|
+|  [Callback]COCOEvaluator.on_train_batch_start                                                                                                                   	|  1.7744e-06     	|  9160           	|  0.016253       	|  0.00013237     	|
+|  [LightningModule]Mask_RCNN.on_before_optimizer_step                                                                                                            	|  1.7713e-06     	|  9160           	|  0.016225       	|  0.00013215     	|
+|  [Callback]LearningRateMonitor.on_after_backward                                                                                                                	|  1.667e-06      	|  9160           	|  0.01527        	|  0.00012437     	|
+|  [LightningModule]Mask_RCNN.on_train_batch_end                                                                                                                  	|  1.6356e-06     	|  9160           	|  0.014982       	|  0.00012202     	|
+|  [LightningModule]Mask_RCNN.on_before_backward                                                                                                                  	|  1.6296e-06     	|  9160           	|  0.014927       	|  0.00012158     	|
+|  [Callback]LearningRateMonitor.on_before_optimizer_step                                                                                                         	|  1.6275e-06     	|  9160           	|  0.014907       	|  0.00012141     	|
+|  [Callback]LearningRateMonitor.on_before_zero_grad                                                                                                              	|  1.6057e-06     	|  9160           	|  0.014709       	|  0.00011979     	|
+|  [Callback]TQDMProgressBar.on_validation_end                                                                                                                    	|  0.0014685      	|  10             	|  0.014685       	|  0.0001196      	|
+|  [Callback]ModelCheckpoint{'monitor': None, 'mode': 'min', 'every_n_train_steps': 0, 'every_n_epochs': 1, 'train_time_interval': None}.on_train_batch_start     	|  1.5771e-06     	|  9160           	|  0.014447       	|  0.00011766     	|
+|  [Callback]ModelSummary.on_train_batch_start                                                                                                                    	|  1.4176e-06     	|  9160           	|  0.012985       	|  0.00010575     	|
+|  [Callback]ModelCheckpoint{'monitor': None, 'mode': 'min', 'every_n_train_steps': 0, 'every_n_epochs': 1, 'train_time_interval': None}.on_after_backward        	|  1.3799e-06     	|  9160           	|  0.01264        	|  0.00010295     	|
+|  [Callback]ModelCheckpoint{'monitor': None, 'mode': 'min', 'every_n_train_steps': 0, 'every_n_epochs': 1, 'train_time_interval': None}.on_before_zero_grad      	|  1.3652e-06     	|  9160           	|  0.012505       	|  0.00010185     	|
+|  [Callback]ModelCheckpoint{'monitor': None, 'mode': 'min', 'every_n_train_steps': 0, 'every_n_epochs': 1, 'train_time_interval': None}.on_before_optimizer_step 	|  1.3641e-06     	|  9160           	|  0.012495       	|  0.00010176     	|
+|  [Callback]LearningRateMonitor.on_before_backward                                                                                                               	|  1.3615e-06     	|  9160           	|  0.012472       	|  0.00010157     	|
+|  [Callback]COCOEvaluator.on_train_batch_end                                                                                                                     	|  1.2881e-06     	|  9160           	|  0.011799       	|  9.6098e-05     	|
+|  [Callback]COCOEvaluator.on_after_backward                                                                                                                      	|  1.2792e-06     	|  9160           	|  0.011718       	|  9.5435e-05     	|
+|  [Callback]COCOEvaluator.on_before_zero_grad                                                                                                                    	|  1.2768e-06     	|  9160           	|  0.011696       	|  9.5253e-05     	|
+|  [Callback]COCOEvaluator.on_before_backward                                                                                                                     	|  1.2751e-06     	|  9160           	|  0.011679       	|  9.5123e-05     	|
+|  [Callback]ModelCheckpoint{'monitor': None, 'mode': 'min', 'every_n_train_steps': 0, 'every_n_epochs': 1, 'train_time_interval': None}.on_before_backward       	|  1.2718e-06     	|  9160           	|  0.01165        	|  9.488e-05      	|
+|  [Callback]ModelSummary.on_after_backward                                                                                                                       	|  1.2564e-06     	|  9160           	|  0.011508       	|  9.3729e-05     	|
+|  [Callback]COCOEvaluator.on_before_optimizer_step                                                                                                               	|  1.234e-06      	|  9160           	|  0.011303       	|  9.2059e-05     	|
+|  [LightningModule]Mask_RCNN.on_validation_model_train                                                                                                           	|  0.0011296      	|  10             	|  0.011296       	|  9.2003e-05     	|
+|  [Strategy]DDPStrategy.on_train_batch_start                                                                                                                     	|  1.2136e-06     	|  9160           	|  0.011116       	|  9.0537e-05     	|
+|  [Callback]ModelSummary.on_before_backward                                                                                                                      	|  1.1835e-06     	|  9160           	|  0.010841       	|  8.829e-05      	|
+|  [Callback]ModelSummary.on_before_zero_grad                                                                                                                     	|  1.1624e-06     	|  9160           	|  0.010647       	|  8.6717e-05     	|
+|  [Callback]ModelSummary.on_train_batch_end                                                                                                                      	|  1.1539e-06     	|  9160           	|  0.01057        	|  8.6083e-05     	|
+|  [Callback]ModelSummary.on_before_optimizer_step                                                                                                                	|  1.1467e-06     	|  9160           	|  0.010504       	|  8.555e-05      	|
+|  [Callback]TQDMProgressBar.on_train_epoch_start                                                                                                                 	|  0.0010079      	|  10             	|  0.010079       	|  8.2088e-05     	|
+|  [Callback]ModelSummary.on_fit_start                                                                                                                            	|  0.006309       	|  1              	|  0.006309       	|  5.1384e-05     	|
+|  [Callback]ModelSummary.on_validation_batch_end                                                                                                                 	|  7.461e-06      	|  790            	|  0.0058942      	|  4.8005e-05     	|
+|  [LightningModule]Mask_RCNN.on_validation_batch_start                                                                                                           	|  7.105e-06      	|  790            	|  0.0056129      	|  4.5714e-05     	|
+|  [Callback]TQDMProgressBar.on_train_epoch_end                                                                                                                   	|  0.00041596     	|  10             	|  0.0041596      	|  3.3878e-05     	|
+|  [Callback]LearningRateMonitor.on_validation_batch_end                                                                                                          	|  2.9341e-06     	|  790            	|  0.0023179      	|  1.8878e-05     	|
+|  [LightningModule]Mask_RCNN.on_validation_batch_end                                                                                                             	|  2.5613e-06     	|  790            	|  0.0020235      	|  1.648e-05      	|
+|  [Callback]LearningRateMonitor.on_validation_batch_start                                                                                                        	|  2.4036e-06     	|  790            	|  0.0018989      	|  1.5465e-05     	|
+|  [Callback]ModelCheckpoint{'monitor': None, 'mode': 'min', 'every_n_train_steps': 0, 'every_n_epochs': 1, 'train_time_interval': None}.on_validation_batch_end  	|  2.0466e-06     	|  790            	|  0.0016168      	|  1.3168e-05     	|
+|  [Callback]ModelCheckpoint{'monitor': None, 'mode': 'min', 'every_n_train_steps': 0, 'every_n_epochs': 1, 'train_time_interval': None}.setup                    	|  0.0014624      	|  1              	|  0.0014624      	|  1.191e-05      	|
+|  [Callback]TQDMProgressBar.on_train_start                                                                                                                       	|  0.0014015      	|  1              	|  0.0014015      	|  1.1414e-05     	|
+|  [Callback]ModelCheckpoint{'monitor': None, 'mode': 'min', 'every_n_train_steps': 0, 'every_n_epochs': 1, 'train_time_interval': None}.on_validation_batch_start	|  1.5522e-06     	|  790            	|  0.0012262      	|  9.9868e-06     	|
+|  [Callback]COCOEvaluator.on_validation_batch_start                                                                                                              	|  1.5099e-06     	|  790            	|  0.0011928      	|  9.715e-06      	|
+|  [Callback]ModelSummary.on_validation_batch_start                                                                                                               	|  1.3274e-06     	|  790            	|  0.0010486      	|  8.5406e-06     	|
+|  [LightningModule]Mask_RCNN.lr_scheduler_step                                                                                                                   	|  0.00010005     	|  10             	|  0.0010005      	|  8.1486e-06     	|
+|  [LightningDataModule]COCODataModule.val_dataloader                                                                                                             	|  0.00089564     	|  1              	|  0.00089564     	|  7.2945e-06     	|
+|  [LightningModule]Mask_RCNN.configure_optimizers                                                                                                                	|  0.00088783     	|  1              	|  0.00088783     	|  7.2309e-06     	|
+|  [Callback]ModelCheckpoint{'monitor': None, 'mode': 'min', 'every_n_train_steps': 0, 'every_n_epochs': 1, 'train_time_interval': None}.on_validation_end        	|  7.3715e-05     	|  10             	|  0.00073715     	|  6.0037e-06     	|
+|  [Callback]TQDMProgressBar.on_train_end                                                                                                                         	|  0.00055247     	|  1              	|  0.00055247     	|  4.4995e-06     	|
+|  [LightningModule]Mask_RCNN.on_validation_epoch_start                                                                                                           	|  3.9386e-05     	|  10             	|  0.00039386     	|  3.2078e-06     	|
+|  [Callback]LearningRateMonitor.on_train_epoch_start                                                                                                             	|  1.7071e-05     	|  10             	|  0.00017071     	|  1.3904e-06     	|
+|  [LightningModule]Mask_RCNN.on_train_end                                                                                                                        	|  0.00014656     	|  1              	|  0.00014656     	|  1.1936e-06     	|
+|  [Callback]LearningRateMonitor.on_validation_start                                                                                                              	|  1.4201e-05     	|  10             	|  0.00014201     	|  1.1566e-06     	|
+|  [Callback]ModelSummary.on_validation_epoch_start                                                                                                               	|  1.4085e-05     	|  10             	|  0.00014085     	|  1.1472e-06     	|
+|  [LightningModule]Mask_RCNN.on_train_epoch_start                                                                                                                	|  1.2528e-05     	|  10             	|  0.00012528     	|  1.0204e-06     	|
+|  [Callback]ModelSummary.on_validation_start                                                                                                                     	|  1.1563e-05     	|  10             	|  0.00011563     	|  9.4171e-07     	|
+|  [Callback]LearningRateMonitor.on_train_start                                                                                                                   	|  0.00010351     	|  1              	|  0.00010351     	|  8.4306e-07     	|
+|  [LightningDataModule]COCODataModule.state_dict                                                                                                                 	|  9.681e-06      	|  10             	|  9.681e-05      	|  7.8846e-07     	|
+|  [Callback]LearningRateMonitor.on_validation_end                                                                                                                	|  9.3165e-06     	|  10             	|  9.3165e-05     	|  7.5877e-07     	|
+|  [Strategy]DDPStrategy.on_validation_start                                                                                                                      	|  9.0958e-06     	|  10             	|  9.0958e-05     	|  7.408e-07      	|
+|  [Callback]ModelSummary.on_validation_epoch_end                                                                                                                 	|  8.9415e-06     	|  10             	|  8.9415e-05     	|  7.2823e-07     	|
+|  [Callback]TQDMProgressBar.on_validation_epoch_end                                                                                                              	|  8.6744e-06     	|  10             	|  8.6744e-05     	|  7.0648e-07     	|
+|  [Callback]COCOEvaluator.on_train_epoch_start                                                                                                                   	|  6.2374e-06     	|  10             	|  6.2374e-05     	|  5.08e-07       	|
+|  [Strategy]DDPStrategy.on_validation_end                                                                                                                        	|  4.4313e-06     	|  10             	|  4.4313e-05     	|  3.6091e-07     	|
+|  [Callback]TQDMProgressBar.on_save_checkpoint                                                                                                                   	|  4.0654e-06     	|  10             	|  4.0654e-05     	|  3.311e-07      	|
+|  [Callback]LearningRateMonitor.on_train_epoch_end                                                                                                               	|  3.9187e-06     	|  10             	|  3.9187e-05     	|  3.1915e-07     	|
+|  [LightningModule]Mask_RCNN.on_validation_start                                                                                                                 	|  3.794e-06      	|  10             	|  3.794e-05      	|  3.09e-07       	|
+|  [LightningModule]Mask_RCNN.on_validation_epoch_end                                                                                                             	|  3.5807e-06     	|  10             	|  3.5807e-05     	|  2.9163e-07     	|
+|  [Callback]TQDMProgressBar.on_validation_epoch_start                                                                                                            	|  2.8212e-06     	|  10             	|  2.8212e-05     	|  2.2977e-07     	|
+|  [LightningModule]Mask_RCNN.on_validation_end                                                                                                                   	|  2.7695e-06     	|  10             	|  2.7695e-05     	|  2.2556e-07     	|
+|  [Callback]ModelCheckpoint{'monitor': None, 'mode': 'min', 'every_n_train_steps': 0, 'every_n_epochs': 1, 'train_time_interval': None}.on_train_epoch_start     	|  2.6523e-06     	|  10             	|  2.6523e-05     	|  2.1602e-07     	|
+|  [Callback]ModelCheckpoint{'monitor': None, 'mode': 'min', 'every_n_train_steps': 0, 'every_n_epochs': 1, 'train_time_interval': None}.on_validation_start      	|  2.3224e-06     	|  10             	|  2.3224e-05     	|  1.8915e-07     	|
+|  [Callback]LearningRateMonitor.on_save_checkpoint                                                                                                               	|  2.1773e-06     	|  10             	|  2.1773e-05     	|  1.7733e-07     	|
+|  [Callback]ModelSummary.on_train_epoch_start                                                                                                                    	|  2.1142e-06     	|  10             	|  2.1142e-05     	|  1.7219e-07     	|
+|  [Callback]ModelCheckpoint{'monitor': None, 'mode': 'min', 'every_n_train_steps': 0, 'every_n_epochs': 1, 'train_time_interval': None}.on_validation_epoch_end  	|  2.0902e-06     	|  10             	|  2.0902e-05     	|  1.7024e-07     	|
+|  [Callback]LearningRateMonitor.on_validation_epoch_end                                                                                                          	|  1.9202e-06     	|  10             	|  1.9202e-05     	|  1.5639e-07     	|
+|  [Callback]ModelCheckpoint{'monitor': None, 'mode': 'min', 'every_n_train_steps': 0, 'every_n_epochs': 1, 'train_time_interval': None}.on_validation_epoch_start	|  1.8931e-06     	|  10             	|  1.8931e-05     	|  1.5418e-07     	|
+|  [Callback]TQDMProgressBar.setup                                                                                                                                	|  1.7452e-05     	|  1              	|  1.7452e-05     	|  1.4214e-07     	|
+|  [Callback]COCOEvaluator.on_validation_end                                                                                                                      	|  1.7141e-06     	|  10             	|  1.7141e-05     	|  1.396e-07      	|
+|  [Callback]ModelCheckpoint{'monitor': None, 'mode': 'min', 'every_n_train_steps': 0, 'every_n_epochs': 1, 'train_time_interval': None}.on_save_checkpoint       	|  1.6997e-06     	|  10             	|  1.6997e-05     	|  1.3843e-07     	|
+|  [Callback]ModelSummary.on_validation_end                                                                                                                       	|  1.5484e-06     	|  10             	|  1.5484e-05     	|  1.2611e-07     	|
+|  [Callback]COCOEvaluator.on_save_checkpoint                                                                                                                     	|  1.4787e-06     	|  10             	|  1.4787e-05     	|  1.2043e-07     	|
+|  [Callback]COCOEvaluator.on_train_epoch_end                                                                                                                     	|  1.4635e-06     	|  10             	|  1.4635e-05     	|  1.1919e-07     	|
+|  [Callback]LearningRateMonitor.on_validation_epoch_start                                                                                                        	|  1.3532e-06     	|  10             	|  1.3532e-05     	|  1.1021e-07     	|
+|  [Callback]ModelSummary.on_train_epoch_end                                                                                                                      	|  1.3442e-06     	|  10             	|  1.3442e-05     	|  1.0948e-07     	|
+|  [Callback]ModelSummary.on_save_checkpoint                                                                                                                      	|  1.2706e-06     	|  10             	|  1.2706e-05     	|  1.0348e-07     	|
+|  [LightningModule]Mask_RCNN.on_save_checkpoint                                                                                                                  	|  1.085e-06      	|  10             	|  1.085e-05      	|  8.8367e-08     	|
+|  [LightningModule]Mask_RCNN.on_train_start                                                                                                                      	|  9.55e-06       	|  1              	|  9.55e-06       	|  7.778e-08      	|
+|  [LightningModule]Mask_RCNN.configure_callbacks                                                                                                                 	|  7.9609e-06     	|  1              	|  7.9609e-06     	|  6.4837e-08     	|
+|  [Callback]TQDMProgressBar.on_fit_end                                                                                                                           	|  5.9609e-06     	|  1              	|  5.9609e-06     	|  4.8548e-08     	|
+|  [LightningDataModule]COCODataModule.prepare_data                                                                                                               	|  5.1588e-06     	|  1              	|  5.1588e-06     	|  4.2016e-08     	|
+|  [LightningModule]Mask_RCNN.on_fit_start                                                                                                                        	|  4.739e-06      	|  1              	|  4.739e-06      	|  3.8597e-08     	|
+|  [Callback]COCOEvaluator.on_train_start                                                                                                                         	|  4.4748e-06     	|  1              	|  4.4748e-06     	|  3.6445e-08     	|
+|  [Callback]LearningRateMonitor.on_train_end                                                                                                                     	|  4.3251e-06     	|  1              	|  4.3251e-06     	|  3.5225e-08     	|
+|  [LightningModule]Mask_RCNN.configure_sharded_model                                                                                                             	|  4.235e-06      	|  1              	|  4.235e-06      	|  3.4491e-08     	|
+|  [Callback]ModelCheckpoint{'monitor': None, 'mode': 'min', 'every_n_train_steps': 0, 'every_n_epochs': 1, 'train_time_interval': None}.on_train_start           	|  4.2252e-06     	|  1              	|  4.2252e-06     	|  3.4412e-08     	|
+|  [Callback]ModelCheckpoint{'monitor': None, 'mode': 'min', 'every_n_train_steps': 0, 'every_n_epochs': 1, 'train_time_interval': None}.on_fit_start             	|  3.77e-06       	|  1              	|  3.77e-06       	|  3.0705e-08     	|
+|  [Callback]TQDMProgressBar.on_fit_start                                                                                                                         	|  3.424e-06      	|  1              	|  3.424e-06      	|  2.7887e-08     	|
+|  [LightningModule]Mask_RCNN.prepare_data                                                                                                                        	|  3.3709e-06     	|  1              	|  3.3709e-06     	|  2.7454e-08     	|
+|  [LightningModule]Mask_RCNN.setup                                                                                                                               	|  2.902e-06      	|  1              	|  2.902e-06      	|  2.3635e-08     	|
+|  [Strategy]DDPStrategy.on_train_start                                                                                                                           	|  2.699e-06      	|  1              	|  2.699e-06      	|  2.1982e-08     	|
+|  [Callback]LearningRateMonitor.setup                                                                                                                            	|  2.5688e-06     	|  1              	|  2.5688e-06     	|  2.0922e-08     	|
+|  [Callback]TQDMProgressBar.teardown                                                                                                                             	|  2.089e-06      	|  1              	|  2.089e-06      	|  1.7013e-08     	|
+|  [Strategy]DDPStrategy.on_train_end                                                                                                                             	|  1.841e-06      	|  1              	|  1.841e-06      	|  1.4994e-08     	|
+|  [Callback]COCOEvaluator.on_train_end                                                                                                                           	|  1.7351e-06     	|  1              	|  1.7351e-06     	|  1.4131e-08     	|
+|  [Callback]LearningRateMonitor.on_fit_end                                                                                                                       	|  1.6592e-06     	|  1              	|  1.6592e-06     	|  1.3513e-08     	|
+|  [Callback]ModelSummary.on_train_end                                                                                                                            	|  1.6589e-06     	|  1              	|  1.6589e-06     	|  1.3511e-08     	|
+|  [Callback]ModelCheckpoint{'monitor': None, 'mode': 'min', 'every_n_train_steps': 0, 'every_n_epochs': 1, 'train_time_interval': None}.on_train_end             	|  1.6459e-06     	|  1              	|  1.6459e-06     	|  1.3405e-08     	|
+|  [LightningModule]Mask_RCNN.on_fit_end                                                                                                                          	|  1.6112e-06     	|  1              	|  1.6112e-06     	|  1.3122e-08     	|
+|  [LightningDataModule]COCODataModule.teardown                                                                                                                   	|  1.5502e-06     	|  1              	|  1.5502e-06     	|  1.2625e-08     	|
+|  [Callback]ModelSummary.on_train_start                                                                                                                          	|  1.5481e-06     	|  1              	|  1.5481e-06     	|  1.2608e-08     	|
+|  [Callback]LearningRateMonitor.on_fit_start                                                                                                                     	|  1.543e-06      	|  1              	|  1.543e-06      	|  1.2567e-08     	|
+|  [Callback]COCOEvaluator.setup                                                                                                                                  	|  1.481e-06      	|  1              	|  1.481e-06      	|  1.2062e-08     	|
+|  [Callback]ModelSummary.setup                                                                                                                                   	|  1.4009e-06     	|  1              	|  1.4009e-06     	|  1.141e-08      	|
+|  [Callback]COCOEvaluator.teardown                                                                                                                               	|  1.3078e-06     	|  1              	|  1.3078e-06     	|  1.0651e-08     	|
+|  [Callback]ModelCheckpoint{'monitor': None, 'mode': 'min', 'every_n_train_steps': 0, 'every_n_epochs': 1, 'train_time_interval': None}.teardown                 	|  1.3029e-06     	|  1              	|  1.3029e-06     	|  1.0612e-08     	|
+|  [Callback]COCOEvaluator.on_fit_start                                                                                                                           	|  1.281e-06      	|  1              	|  1.281e-06      	|  1.0433e-08     	|
+|  [Callback]LearningRateMonitor.teardown                                                                                                                         	|  1.1502e-06     	|  1              	|  1.1502e-06     	|  9.3676e-09     	|
+|  [Callback]COCOEvaluator.on_fit_end                                                                                                                             	|  1.1341e-06     	|  1              	|  1.1341e-06     	|  9.2368e-09     	|
+|  [Callback]ModelCheckpoint{'monitor': None, 'mode': 'min', 'every_n_train_steps': 0, 'every_n_epochs': 1, 'train_time_interval': None}.on_fit_end               	|  1.122e-06      	|  1              	|  1.122e-06      	|  9.1382e-09     	|
+|  [Callback]ModelSummary.teardown                                                                                                                                	|  1.112e-06      	|  1              	|  1.112e-06      	|  9.0566e-09     	|
+|  [Callback]ModelSummary.on_fit_end                                                                                                                              	|  1.0461e-06     	|  1              	|  1.0461e-06     	|  8.52e-09       	|
+|  [LightningModule]Mask_RCNN.teardown                                                                                                                            	|  8.3004e-07     	|  1              	|  8.3004e-07     	|  6.7602e-09     	|
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+wandb: Waiting for W&B process to finish... (success).
+wandb: 
+wandb: Run history:
+wandb:               epoch ▁▁▁▁▂▂▂▂▃▃▃▃▃▃▃▃▄▄▄▄▅▅▅▅▆▆▆▆▆▆▆▆▇▇▇▇████
+wandb:      evaluator_time ▃▁▅█▃▃▇▆▃▅
+wandb:        loss_box_reg ▃▄▅▇▇▇█▆▅▅▅▃▄▃▃▃▃▄▃▄▄▂▂▃▄▃▃▃▁▃▂▄▃▂▃▄▁▁▃▃
+wandb:     loss_classifier ████▆▆▆▄▃▃▄▃▃▂▂▂▂▃▂▂▃▁▂▂▃▂▁▂▁▂▁▂▂▂▂▂▁▁▂▂
+wandb:           loss_mask █▆▅▅▄▃▃▃▂▃▂▂▂▂▂▁▂▂▁▁▂▁▁▂▁▂▁▂▁▂▁▂▁▂▁▂▁▁▂▂
+wandb:     loss_objectness █▄▄▃▃▃▂▂▂▂▂▂▂▂▂▂▁▁▁▂▁▁▁▁▁▁▁▂▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:    loss_rpn_box_reg █▇▅▄▄▅▆▄▃▃▃▃▄▂▃▂▂▃▂▄▄▁▂▃▄▂▂▃▁▃▂▄▂▂▂▂▂▁▃▃
+wandb:              lr-SGD ▃▃▃▃████████████████▂▂▂▂▂▂▂▂▂▂▂▂▁▁▁▁▁▁▁▁
+wandb:     lr-SGD-momentum ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:         map_50_bbox ▁▆▇▇██████
+wandb:         map_50_segm ▁▆▇▇██████
+wandb:            map_bbox ▁▅▆▇▇█████
+wandb:            map_segm ▁▅▆▇██████
+wandb:            mar_bbox ▁▆▇▇██████
+wandb:            mar_segm ▁▆▇▇██████
+wandb:          model_time ▅▁█▇█▅▆▃▅▆
+wandb: trainer/global_step ▁▁▁▂▂▂▂▂▂▃▃▃▃▃▄▄▄▄▄▄▅▅▅▅▅▅▆▆▆▆▆▇▇▇▇▇▇███
+wandb:       training_loss █▄▃▂▂▁▁▁▁▁
+wandb:  training_step_loss █▇▆▆▅▅▅▄▃▃▃▂▃▂▂▂▂▂▂▂▂▁▂▂▂▂▂▂▁▂▁▂▂▂▂▂▁▁▂▂
+wandb: 
+wandb: Run summary:
+wandb:               epoch 9
+wandb:      evaluator_time 0.41301
+wandb:        loss_box_reg 0.26011
+wandb:     loss_classifier 0.23404
+wandb:           loss_mask 0.3009
+wandb:     loss_objectness 0.05652
+wandb:    loss_rpn_box_reg 0.06095
+wandb:              lr-SGD 0.0002
+wandb:     lr-SGD-momentum 0.9
+wandb:         map_50_bbox 0.51895
+wandb:         map_50_segm 0.47929
+wandb:            map_bbox 0.30454
+wandb:            map_segm 0.27242
+wandb:            mar_bbox 0.46159
+wandb:            mar_segm 0.41104
+wandb:          model_time 0.65398
+wandb: trainer/global_step 9159
+wandb:       training_loss 0.91886
+wandb:  training_step_loss 0.91251
+wandb: 
+wandb: 🚀 View run sgd-16-multistep-baseline at: https://wandb.ai/ilhamsyahids/MaskRCNN/runs/9zvfhxqb
+wandb: Synced 5 W&B file(s), 1 media file(s), 3 artifact file(s) and 0 other file(s)
+wandb: Find logs at: /raid/data/m23522033/logs/wandb/run-20230421_060457-9zvfhxqb/logs
