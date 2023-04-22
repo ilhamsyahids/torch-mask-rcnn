@@ -21,9 +21,6 @@ def get_args_parser(add_help=True):
     return parser
 
 def main(cfg):
-    if cfg.OUTPUT_DIR:
-        utils.mkdir(cfg.OUTPUT_DIR + '/' + cfg.CONFIG_NAME)
-    
     utils.init_random_seed()
 
     print("Building logger...")
@@ -36,6 +33,11 @@ def main(cfg):
         'log_model': True # log model at the end of training
         # 'offline': True
     }
+    if cfg.RESUMED:
+        wandb_logger_params['id'] = cfg.LOGGER.ID
+        wandb_logger_params['version'] = cfg.LOGGER.ID
+        wandb_logger_params['resume'] = "must"
+
     wandb_logger = WandbLogger(**wandb_logger_params)
     wandb_logger.log_hyperparams(cfg)
 
@@ -59,6 +61,9 @@ def main(cfg):
 
     print("Building callback...")
     callbacks = []
+
+    # if cfg.OUTPUT_DIR:
+    #     utils.mkdir(cfg.OUTPUT_DIR + '/' + cfg.CONFIG_NAME)
 
     # checkpoint_params = {
     #     # 'monitor': 'map_bbox',

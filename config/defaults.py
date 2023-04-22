@@ -110,5 +110,6 @@ _C.SCHEDULER.WARMUP_METHOD = "linear"
 _C.LOGGER = CN()
 _C.LOGGER.OUTPUT_DIR = "logs"
 _C.LOGGER.VERSION = 1
+_C.LOGGER.ID = ""
 
 cfg = _C
