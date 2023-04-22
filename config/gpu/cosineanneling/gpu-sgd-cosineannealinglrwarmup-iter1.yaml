@@ -1,0 +1,13 @@
+PROJECT_NAME: "MaskRCNN"
+
+CONFIG_NAME: "sgd-16-cosineannealinglrwarmup-iter1"
+
+EPOCHS: 10
+
+SCHEDULER:
+  NAME: "cosineannealinglrwarmup"
+  WARMUP_ITERS: 1
+  MAX_ITER: 1
+
+DATASET:
+  ASPECT_RATIO_GROUP_FACTOR: 2

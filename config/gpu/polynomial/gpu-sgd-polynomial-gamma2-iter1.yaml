@@ -1,0 +1,13 @@
+PROJECT_NAME: "MaskRCNN"
+
+CONFIG_NAME: "sgd-16-polynomial2-iter1"
+
+EPOCHS: 10
+
+SCHEDULER:
+  NAME: "polynomial"
+  MAX_ITER: 1
+  GAMMA: 2.0
+
+DATASET:
+  ASPECT_RATIO_GROUP_FACTOR: 2

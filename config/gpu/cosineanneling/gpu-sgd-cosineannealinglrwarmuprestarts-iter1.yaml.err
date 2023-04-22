@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "train.py", line 142, in <module>
+    cfg.merge_from_file(args.config_file)
+  File "/home/m23522033/torch-mask-rcnn/.venv/lib/python3.8/site-packages/yacs/config.py", line 213, in merge_from_file
+    self.merge_from_other_cfg(cfg)
+  File "/home/m23522033/torch-mask-rcnn/.venv/lib/python3.8/site-packages/yacs/config.py", line 217, in merge_from_other_cfg
+    _merge_a_into_b(cfg_other, self, self, [])
+  File "/home/m23522033/torch-mask-rcnn/.venv/lib/python3.8/site-packages/yacs/config.py", line 478, in _merge_a_into_b
+    _merge_a_into_b(v, b[k], root, key_list + [k])
+  File "/home/m23522033/torch-mask-rcnn/.venv/lib/python3.8/site-packages/yacs/config.py", line 474, in _merge_a_into_b
+    v = _check_and_coerce_cfg_value_type(v, b[k], k, full_key)
+  File "/home/m23522033/torch-mask-rcnn/.venv/lib/python3.8/site-packages/yacs/config.py", line 534, in _check_and_coerce_cfg_value_type
+    raise ValueError(
+ValueError: Type mismatch (<class 'float'> vs. <class 'int'>) with values (0.1 vs. 2) for config key: SCHEDULER.GAMMA
