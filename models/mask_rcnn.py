@@ -209,6 +209,7 @@ class Mask_RCNN(pl.LightningModule):
             'lr': self.cfg.OPTIMIZER.LR,
             'weight_decay': self.cfg.OPTIMIZER.WEIGHT_DECAY,
             'nesterov': self.cfg.OPTIMIZER.NESTEROV,
+            'dampening': self.cfg.OPTIMIZER.DAMPENING,
             'momentum': self.cfg.OPTIMIZER.MOMENTUM,
         }
         optimizer = optimizers.get_optimizer(**optimizer_params)
