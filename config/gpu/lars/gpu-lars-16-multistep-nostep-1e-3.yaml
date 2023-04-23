@@ -1,0 +1,12 @@
+PROJECT_NAME: "MaskRCNN"
+
+CONFIG_NAME: "lars-16-multistep-nostep-1e-3"
+
+EPOCHS: 10
+
+DATASET:
+  ASPECT_RATIO_GROUP_FACTOR: 2
+
+OPTIMIZER:
+  NAME: "lars"
+  LR: 0.001
