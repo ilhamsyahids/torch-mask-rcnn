@@ -1,0 +1,15 @@
+PROJECT_NAME: "MaskRCNN"
+
+CONFIG_NAME: "lars-16-multistep-warm1-step1"
+
+EPOCHS: 10
+
+SCHEDULER:
+  STEPS: (1,)
+  WARMUP_ITERS: 1
+
+DATASET:
+  ASPECT_RATIO_GROUP_FACTOR: 2
+
+OPTIMIZER:
+  NAME: "lars"
