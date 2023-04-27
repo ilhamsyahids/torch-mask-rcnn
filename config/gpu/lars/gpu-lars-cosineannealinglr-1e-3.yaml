@@ -1,0 +1,16 @@
+PROJECT_NAME: "MaskRCNN"
+
+CONFIG_NAME: "lars-16-cosineannealinglr-1e-3"
+
+EPOCHS: 10
+
+SCHEDULER:
+  NAME: "cosineannealinglr"
+  MAX_ITER: 10
+
+DATASET:
+  ASPECT_RATIO_GROUP_FACTOR: 2
+
+OPTIMIZER:
+  NAME: "lars"
+  LR: 0.001
