@@ -1,0 +1,12 @@
+PROJECT_NAME: "MaskRCNN"
+
+CONFIG_NAME: "sgd-16-cosineannealinglr"
+
+EPOCHS: 10
+
+SCHEDULER:
+  NAME: "cosineannealinglr"
+  MAX_ITER: 10
+
+DATASET:
+  ASPECT_RATIO_GROUP_FACTOR: 2

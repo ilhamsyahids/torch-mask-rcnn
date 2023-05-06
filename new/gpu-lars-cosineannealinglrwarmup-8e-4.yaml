@@ -1,0 +1,17 @@
+PROJECT_NAME: "MaskRCNN"
+
+CONFIG_NAME: "lars-16-cosineannealinglrwarmup-8e-4"
+
+EPOCHS: 10
+
+SCHEDULER:
+  NAME: "cosineannealinglrwarmup"
+  WARMUP_ITERS: 1
+  MAX_ITER: 10
+
+DATASET:
+  ASPECT_RATIO_GROUP_FACTOR: 2
+
+OPTIMIZER:
+  NAME: "lars"
+  LR: 0.0008
