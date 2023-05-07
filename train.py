@@ -26,6 +26,8 @@ def main(cfg):
     print("Building logger...")
     utils.mkdir(cfg.LOGGER.OUTPUT_DIR + "/wandb")
 
+    loggers = []
+
     wandb_logger_params = {
         'name': cfg.CONFIG_NAME,
         'project': cfg.PROJECT_NAME,
@@ -40,6 +42,7 @@ def main(cfg):
 
     wandb_logger = WandbLogger(**wandb_logger_params)
     wandb_logger.log_hyperparams(cfg)
+    loggers.append(wandb_logger)
 
     csv_logger_params = {
         'name': cfg.CONFIG_NAME,
@@ -47,6 +50,7 @@ def main(cfg):
         'version': cfg.LOGGER.VERSION,
     }
     csv_logger = CSVLogger(**csv_logger_params)
+    loggers.append(csv_logger)
 
     tb_logger_params = {
         'name': cfg.CONFIG_NAME,
@@ -54,6 +58,7 @@ def main(cfg):
         'version': cfg.LOGGER.VERSION,
     }
     tb_logger = TensorBoardLogger(**tb_logger_params)
+    loggers.append(tb_logger)
 
     print("Building DataModule...")
 
@@ -111,7 +116,7 @@ def main(cfg):
     training_params = {
         # 'enable_progress_bar': False,
         'profiler': "simple",
-        "logger": [wandb_logger, csv_logger, tb_logger],
+        "logger": loggers,
         'callbacks': callbacks,
         'precision': cfg.ACCELERATOR.PRECISION,
         'accelerator': cfg.ACCELERATOR.NAME,
