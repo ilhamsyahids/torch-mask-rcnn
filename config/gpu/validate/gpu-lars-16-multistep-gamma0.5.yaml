@@ -1,0 +1,20 @@
+PROJECT_NAME: "MaskRCNN"
+
+CONFIG_NAME: "lars-16-multistep-gamma0.5-validate"
+
+EPOCHS: 10
+
+SCHEDULER:
+  STEPS: (5,8)
+  WARMUP_ITERS: 1
+  GAMMA: 0.5
+
+DATASET:
+  ASPECT_RATIO_GROUP_FACTOR: 2
+
+OPTIMIZER:
+  NAME: "lars"
+  LR: 0.001
+
+ACCELERATOR:
+  DEVICES: [1, 2, 3, 4, 5, 7]
