@@ -33,6 +33,7 @@ def get_optimizer(opt: str, parameters: Iterator[torch.nn.Parameter], lr: float,
             dampening=kwargs['dampening'],
             weight_decay=weight_decay,
             nesterov=kwargs['nesterov'],
+            log=kwargs['log'],
         )
     elif opt_name == "lamb":
         optimizer = LAMB(

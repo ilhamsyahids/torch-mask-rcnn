@@ -58,6 +58,7 @@ class LARS(Optimizer):
         weight_decay: float = 0.0,
         nesterov: bool = False,
         scale_clip: Optional[Tuple[float, float]] = None,
+        log = None,
     ) -> None:
         if not isinstance(lr, float) or lr < 0.0:
             raise ValueError(f"Invalid learning rate: {lr}")
@@ -71,6 +72,7 @@ class LARS(Optimizer):
             raise ValueError("Nesterov momentum requires a momentum and zero dampening")
         super().__init__(params, defaults)
         # LARS arguments
+        self.log = log
         self.scale_clip = scale_clip
         if self.scale_clip is None:
             self.scale_clip = (0.0, 10.0)
@@ -114,6 +116,9 @@ class LARS(Optimizer):
                     local_lr = 1
                 else:
                     local_lr = p_norm / denom
+
+                if self.log:
+                    self.log('local_lr', local_lr, rank_zero_only=True)
 
                 if momentum == 0:
                     p.data.add_(d_p, alpha=-group["lr"] * local_lr)

@@ -126,6 +126,7 @@ class Mask_RCNN(pl.LightningModule):
     def on_train_epoch_end(self) -> None:
         iter_time = time.time() - self.epoch_time
         iter_time_str = str(datetime.timedelta(seconds=int(iter_time)))
+        self.print()
         self.print(f"Total time on epoch {self.current_epoch}: {iter_time_str}")
 
         total_time = time.time() - self.start_time
@@ -161,6 +162,7 @@ class Mask_RCNN(pl.LightningModule):
             "logger": True,
             "batch_size": len(train_batch),
             "prog_bar": True,
+            "rank_zero_only": True
         }
         self.log('training_step_loss', loss_value, **params)
         self.log_dict(loss_dict_reduced, **params)
@@ -175,6 +177,34 @@ class Mask_RCNN(pl.LightningModule):
         self.training_step_outputs.append(losses)
 
         return losses
+
+    def on_before_optimizer_step(self, optimizer):
+        # LARS
+        if self.cfg.OPTIMIZER.NAME != 'lars':
+            return
+        
+        if self.trainer.global_step % 25 == 0:  # don't make the tf file huge
+            for k, p in self.named_parameters():
+                # ignore log backbone
+                if ('backbone' in k):
+                    continue
+
+                if p.grad is None:
+                    continue
+                d_p = p.grad.data
+
+                p_norm = torch.norm(p.data)
+                denom = torch.norm(d_p)
+
+                # Compute the local LR
+                if p_norm == 0 or denom == 0:
+                    local_lr = 1
+                else:
+                    local_lr = p_norm / denom
+                
+                k = k.replace('model.', '', 1)
+                n = "local_lr/" + k
+                self.log(n, local_lr, rank_zero_only=True)
 
     def on_validation_epoch_start(self) -> None:
         self.cpu_device = torch.device("cpu")
@@ -211,6 +241,7 @@ class Mask_RCNN(pl.LightningModule):
             'nesterov': self.cfg.OPTIMIZER.NESTEROV,
             'dampening': self.cfg.OPTIMIZER.DAMPENING,
             'momentum': self.cfg.OPTIMIZER.MOMENTUM,
+            'log': self.log,
         }
         optimizer = optimizers.get_optimizer(**optimizer_params)
 

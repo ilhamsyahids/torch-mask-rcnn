@@ -58,19 +58,8 @@ class COCODataModule(pl.LightningDataModule):
             'num_workers': num_workers,
         }
 
-        train_sampler = torch.utils.data.distributed.DistributedSampler(self.train_dataset)
-
-        # required for TPU support
-        if self.cfg.ACCELERATOR.NAME == 'tpu':
-            import torch_xla.core.xla_model as xm
-
-            train_sampler = torch.utils.data.distributed.DistributedSampler(
-                self.train_dataset, num_replicas=xm.xrt_world_size(), rank=xm.get_ordinal(), shuffle=True
-            )
-
-            train_dataloader_params['sampler'] = train_sampler
-
         if self.cfg.DATASET.ASPECT_RATIO_GROUP_FACTOR >= 0:
+            train_sampler = torch.utils.data.distributed.DistributedSampler(self.train_dataset)
             group_ids = create_aspect_ratio_groups(self.train_dataset, k=self.cfg.DATASET.ASPECT_RATIO_GROUP_FACTOR)
             train_batch_sampler = GroupedBatchSampler(train_sampler, group_ids, self.cfg.DATALOADER.TRAIN_BATCH_SIZE)
             train_dataloader_params['batch_sampler'] = train_batch_sampler
