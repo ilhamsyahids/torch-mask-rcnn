@@ -1,0 +1,12 @@
+PROJECT_NAME: "MaskRCNN"
+
+CONFIG_NAME: "sgd-16-multistep-warm3-gamma2-nostep"
+
+EPOCHS: 10
+
+SCHEDULER:
+  WARMUP_ITERS: 3
+  GAMMA: 2.0
+
+DATASET:
+  ASPECT_RATIO_GROUP_FACTOR: 2
