@@ -4,8 +4,8 @@ if [ $# -lt 1 ]; then
     exit 1
 fi
 
-source .venv/bin/activate
+# source .venv/bin/activate
 
-echo "running $@"
+echo "nohup ./run.sh $@ > $@/run.out 2> $@/run.err < /dev/null &"
 
-nohup ./run.sh $@ > $@/run.out 2> $@/run.err < /dev/null &
+# nohup ./run.sh $@ > $@/run.out 2> $@/run.err < /dev/null &

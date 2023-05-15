@@ -5,7 +5,8 @@ if [ $# -lt 1 ]; then
 fi
 
 # get all yaml file in config folder
-config_files=$(ls $@/*.yaml)
+# config_files=$(ls $@/*.yaml)
+config_files=$(ls $@/*.yaml | sort -r)
 
 for config_file in $config_files
 do
@@ -16,3 +17,5 @@ do
 
     echo "finished $config_file"
 done
+
+echo "Done Experiments"

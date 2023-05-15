@@ -1,6 +1,6 @@
 
 if [ $# -lt 1 ]; then
-    echo "Usage: $0 <config-folder>"
+    echo "Usage: $0 <config-file>"
     exit 1
 fi
 
