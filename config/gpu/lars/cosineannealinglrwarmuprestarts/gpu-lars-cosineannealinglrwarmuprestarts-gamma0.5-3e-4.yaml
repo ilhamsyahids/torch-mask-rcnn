@@ -1,6 +1,6 @@
 PROJECT_NAME: "MaskRCNN"
 
-CONFIG_NAME: "lars-16-cosineannealinglrwarmuprestarts-gamma2-1e-3"
+CONFIG_NAME: "lars-16-cosineannealinglrwarmuprestarts-gamma0.5-3e-4"
 
 EPOCHS: 10
 
@@ -8,12 +8,12 @@ SCHEDULER:
   NAME: "cosineannealinglrwarmuprestarts"
   WARMUP_ITERS: 1
   MAX_ITER: 10
-  BASE_LR: 0.001
-  GAMMA: 2
+  BASE_LR: 0.00033
+  GAMMA: 0.5
 
 DATASET:
   ASPECT_RATIO_GROUP_FACTOR: 2
 
 OPTIMIZER:
   NAME: "lars"
-  LR: 0.001
+  LR: 0.00033

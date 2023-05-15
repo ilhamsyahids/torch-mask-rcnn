@@ -8,6 +8,7 @@ SCHEDULER:
   NAME: "cosineannealinglrwarmuprestarts"
   WARMUP_ITERS: 1
   MAX_ITER: 10
+  BASE_LR: 0.001
   GAMMA: 0.5
 
 DATASET:
