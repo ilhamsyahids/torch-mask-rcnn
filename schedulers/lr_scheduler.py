@@ -1,6 +1,7 @@
 import math
 import torch
 
+from torch.optim.lr_scheduler import PolynomialLR
 from torch.optim.lr_scheduler import _LRScheduler
 from bisect import bisect_right
 
@@ -199,3 +200,42 @@ class CosineAnnealingWarmupRestarts(_LRScheduler):
         self.last_epoch = math.floor(epoch)
         for param_group, lr in zip(self.optimizer.param_groups, self.get_lr()):
             param_group['lr'] = lr
+
+class WarmupPolynomialLR(PolynomialLR):
+    def __init__(
+            self,
+            optimizer,
+            total_iters=5,
+            power=1.0,
+            last_epoch=-1,
+            verbose=False,
+            warmup_factor: float = 0.001,
+            warmup_iters: int = 1000,
+            warmup_method: str = "linear",
+        ):
+        self.total_iters = total_iters
+        self.power = power
+        self.warmup_factor = warmup_factor
+        self.warmup_iters = warmup_iters
+        self.warmup_method = warmup_method
+        super().__init__(optimizer, last_epoch, verbose)
+
+    def get_lr(self):
+        warmup_factor, delta = _get_warmup_factor_at_iter(
+            self.warmup_method, self.last_epoch, self.warmup_iters, self.warmup_factor
+        )
+
+        if self.last_epoch == 0 or self.last_epoch > self.total_iters:
+            return [
+                (base_lr - delta)
+                * warmup_factor
+                for base_lr in self.base_lrs
+            ]
+
+        decay_factor = ((1.0 - self.last_epoch / self.total_iters) / (1.0 - (self.last_epoch - 1) / self.total_iters)) ** self.power
+        return [
+            (base_lr - delta)
+            * warmup_factor
+            * decay_factor
+            for base_lr in self.base_lrs
+        ]
