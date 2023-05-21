@@ -32,7 +32,7 @@ def main(cfg):
         'name': cfg.CONFIG_NAME,
         'project': cfg.PROJECT_NAME,
         'save_dir': cfg.LOGGER.OUTPUT_DIR,
-        'log_model': True # log model at the end of training
+        'log_model': False # log model at the end of training
         # 'offline': True
     }
     if cfg.RESUMED:
