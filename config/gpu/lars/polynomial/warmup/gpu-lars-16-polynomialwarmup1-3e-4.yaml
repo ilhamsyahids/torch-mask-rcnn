@@ -1,0 +1,19 @@
+PROJECT_NAME: "MaskRCNN"
+
+CONFIG_NAME: "lars-16-polynomialwarmup1-3e-4"
+
+EPOCHS: 10
+
+SCHEDULER:
+  NAME: "polynomialwarmup"
+  MAX_ITER: 10
+  GAMMA: 1.0
+  WARMUP_ITERS: 1
+  WARMUP_METHOD: "linear"
+
+DATASET:
+  ASPECT_RATIO_GROUP_FACTOR: 2
+
+OPTIMIZER:
+  NAME: "lars"
+  LR: 0.00033
