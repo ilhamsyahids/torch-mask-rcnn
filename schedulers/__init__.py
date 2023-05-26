@@ -29,8 +29,9 @@ def get_scheduler(name: str, optimizer, cfg):
     elif name == "cosineannealinglrwarmuprestarts":
         lr_scheduler = CosineAnnealingWarmupRestarts(
             optimizer,
-            first_cycle_steps=cfg.SCHEDULER.MAX_ITER, # total steps SCHEDULER.max_iter T_0
+            first_cycle_steps=cfg.SCHEDULER.FIRST_CYCLE, # first cycle T_0
             max_lr = cfg.SCHEDULER.BASE_LR, # max lr or base lr init_lr max_lr
+            min_lr = cfg.SCHEDULER.MIN_LR,
             gamma=cfg.SCHEDULER.GAMMA, # lr decay gamma
             warmup_steps=cfg.SCHEDULER.WARMUP_ITERS, # warmup steps T_up
         )
