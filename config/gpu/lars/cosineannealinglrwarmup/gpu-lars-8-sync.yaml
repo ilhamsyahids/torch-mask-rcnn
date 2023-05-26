@@ -1,0 +1,24 @@
+PROJECT_NAME: "MaskRCNN"
+
+CONFIG_NAME: "lars-8-caw-8e-4-new-sync"
+
+EPOCHS: 10
+
+SCHEDULER:
+  NAME: "cosineannealinglrwarmup"
+  WARMUP_ITERS: 1
+  MAX_ITER: 10
+
+DATASET:
+  ASPECT_RATIO_GROUP_FACTOR: 2
+
+OPTIMIZER:
+  NAME: "lars"
+  LR: 0.0008
+
+DATALOADER:
+  TRAIN_BATCH_SIZE: 8
+
+MODEL:
+  USE_SYNC_BATCH_NORM: True
+
