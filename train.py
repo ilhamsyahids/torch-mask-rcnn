@@ -123,6 +123,7 @@ def main(cfg):
         'devices': cfg.ACCELERATOR.DEVICES,
         'max_epochs': cfg.EPOCHS,
         'strategy': cfg.STRATEGY,
+        'num_nodes': cfg.NUM_NODES,
         'num_sanity_val_steps': 0,
     }
     fit_params = {
