@@ -24,6 +24,7 @@ _C.EPOCHS = 1
 _C.USE_SIMPLE_COPY_PASTE = False
 
 _C.PRINT_FREQ = 20
+_C.USE_RAY = False
 
 _C.STRATEGY = "auto"
 _C.NUM_NODES = 1

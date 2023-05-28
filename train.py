@@ -130,6 +130,14 @@ def main(cfg):
         'model': model,
         'datamodule': datamodule,
     }
+    if cfg.USE_RAY:
+        from ray_lightning import RayStrategy
+
+        workers = len(cfg.ACCELERATOR.DEVICES)
+
+        strategy = RayStrategy(num_workers=workers, use_gpu=True)
+        training_params['strategy'] = strategy
+
     if cfg.MODEL.USE_SYNC_BATCH_NORM:
         training_params['sync_batchnorm'] = True
     if cfg.MODEL.DETERMINISTIC:
