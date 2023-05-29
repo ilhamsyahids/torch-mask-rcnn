@@ -1,6 +1,6 @@
 PROJECT_NAME: "MaskRCNN"
 
-CONFIG_NAME: "multi-p3.16xlarge-1"
+CONFIG_NAME: "multi-sync-p3.16xlarge-1"
 
 EPOCHS: 10
 NUM_NODES: 2
