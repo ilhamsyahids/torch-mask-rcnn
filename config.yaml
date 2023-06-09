@@ -1,0 +1,65 @@
+cluster_name: multinode-training-large
+
+# Cloud-provider specific configuration.
+provider:
+    type: aws
+    region: us-east-1
+
+auth:
+    ssh_user: ubuntu
+
+available_node_types:
+    ray.head.default:
+        node_config:
+            InstanceType: p3.16xlarge
+            ImageId: ami-0ee956c7cfce4bebf  # Deep Learning AMI GPU PyTorch 2.0.0 (Ubuntu 20.04) 20230524
+            TagSpecifications:
+                - 'ResourceType': 'instance'
+                  'Tags': [{'Key': 'createdBy', 'Value': 'ilham'}]
+            BlockDeviceMappings:
+                - DeviceName: /dev/sda1
+                  Ebs:
+                      VolumeSize: 100
+    ray.worker.default:
+        min_workers: 1
+        max_workers: 1
+        node_config:
+            InstanceType: p3.16xlarge
+            ImageId: ami-0ee956c7cfce4bebf  # Deep Learning AMI GPU PyTorch 2.0.0 (Ubuntu 20.04) 20230524
+            TagSpecifications:
+                - 'ResourceType': 'instance'
+                  'Tags': [{'Key': 'createdBy', 'Value': 'ilham'}]
+            BlockDeviceMappings:
+                - DeviceName: /dev/sda1
+                  Ebs:
+                      VolumeSize: 100
+
+head_node_type: ray.head.default
+
+file_mounts: {
+   "~/mount": "./mount",
+}
+
+setup_commands:
+#   - sleep 2
+  - sudo chown -R $(whoami) /opt/conda/*
+  - conda create -y -n "ray" python=3.8.10
+  - conda init bash
+  - conda activate ray && echo 'conda activate ray' >> ~/.bashrc
+#   - conda activate pytorch && echo 'conda activate pytorch' >> ~/.bashrc
+  - python -m pip install --upgrade pip
+  - pip install -U "ray[default]"
+#   - pip install ray==2.4.0
+  - git clone http://github.com/ilhamsyahids/torch-mask-rcnn || true
+  - python -m pip install -r torch-mask-rcnn/requirements.txt
+#   - cd torch-mask-rcnn && pip install -r requirements.txt
+#   - rm -rf data/coco
+  - cd torch-mask-rcnn && ./prepare-coco-dataset.sh ../data/coco
+
+head_start_ray_commands:
+    - ray stop
+    - ray start --head --port=6379 --object-manager-port=8076 --autoscaling-config=~/ray_bootstrap_config.yaml
+
+worker_start_ray_commands:
+    - ray stop
+    - ray start --address=$RAY_HEAD_IP:6379 --object-manager-port=8076
